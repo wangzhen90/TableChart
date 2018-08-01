@@ -58,10 +58,16 @@ public class Column<T extends ICell> {
 
     }
 
+
+
     public Column(String columnName) {
         this.columnName = columnName;
     }
 
+    public Column(String columnName,boolean isFixed) {
+        this.columnName = columnName;
+        this.isFixed = isFixed;
+    }
 
     public void setData(List<T> datas) {
         this.datas = datas;
@@ -166,5 +172,13 @@ public class Column<T extends ICell> {
 
     public void setRightOffset(int rightOffset) {
         this.rightOffset = rightOffset;
+    }
+
+    public boolean isFixed() {
+        return isFixed;
+    }
+
+    public void setFixed(boolean fixed) {
+        isFixed = fixed;
     }
 }

@@ -55,6 +55,7 @@ public class SimpleRenderer extends DataRenderer {
     }
 
     private RectF mValuesRect = new RectF();
+    private RectF mFixedRect = new RectF();
 
     @Override
     public void drawData(Canvas c) {
@@ -65,7 +66,6 @@ public class SimpleRenderer extends DataRenderer {
         mValuesRect.top += mChart.getTitleHeight() * mViewPortHandler.getScaleY();
         int clipRestoreCount = c.save();
         c.clipRect(mValuesRect);
-//        c.translate(0, mChart.getTitleHeight() * mViewPortHandler.getScaleY());
         long startTime = System.currentTimeMillis();
 
         for (int i = 0; i < mChart.getColumnCount(); i++) {
@@ -94,25 +94,9 @@ public class SimpleRenderer extends DataRenderer {
         ColumnBuffer columnBuffer = mBuffers[index];
 
         if (columnBuffer.size() >= 4) {
-//            checkBuffer[0] = column.getPreColumnsWidth();
-//            checkBuffer[3] = column.getPreColumnsWidth() + column.getWidth();
-
             checkRect.set(column.getPreColumnsWidth(), 0, column.getPreColumnsWidth() + column.getWidth(), 0);
 
-            if (index < 1) {
-//                Log.e("3=======:start","checkBuffer left +"+index+"+:"+checkBuffer[0] + ",right:"+checkBuffer[3]);
-//                Log.e("3=======:start","checkRect left +"+index+"+:"+checkRect.left + ",right:"+checkRect.right);
-            }
             transformer.rectValueToPixel(checkRect);
-//            transformer.pointValuesToPixel(checkBuffer);
-            if (index < 1) {
-//                Log.e("3=======:","checkBuffer left +"+index+"+:"+checkBuffer[0] + ",right:"+checkBuffer[3]);
-//                Log.e("3=======:","checkRect left +"+index+"+:"+checkRect.left + ",right:"+checkRect.right);
-//                Log.e("3=======:","visibleRect left+"+index+"+:"+visibleRect.left + ",right:"+visibleRect.right);
-            }
-
-
-//            if ((checkBuffer[0] - 10> visibleRect.right) || (checkBuffer[3] + 10 < visibleRect.left)) {
             if ((checkRect.left - 10 > visibleRect.right) || (checkRect.right + 10 < visibleRect.left)) {
                 return;
             }
@@ -167,8 +151,6 @@ public class SimpleRenderer extends DataRenderer {
                      Utils.getTextCenterX(
                              columnBuffer.buffer[i] + column.getLeftOffset() * mChart.getViewPortHandler().getScaleX(),
                              columnBuffer.buffer[i + 2] - column.getRightOffset() * mChart.getViewPortHandler().getScaleX(),
-//                             columnBuffer.buffer[i],
-//                             columnBuffer.buffer[i + 2],
                              mValuePaint),
                     Utils.getTextCenterY((columnBuffer.buffer[i + 1] + columnBuffer.buffer[i + 3]) / 2, mValuePaint),
                     column.getData().get(i / 4).getContents()
@@ -204,6 +186,10 @@ public class SimpleRenderer extends DataRenderer {
         mTitleBuffer.feed(mChart.getColumnList());
         transformer.pointValuesToPixel(mTitleBuffer.buffer);
 
+        Column column;
+        int clipCount = 0;
+        mFixedRect.set(mViewPortHandler.getContentRect());
+
         for (int i = 0; i < mTitleBuffer.size(); i += 4) {
 
             float left = mTitleBuffer.buffer[i];
@@ -211,10 +197,6 @@ public class SimpleRenderer extends DataRenderer {
             float right = mTitleBuffer.buffer[i + 2];
             float bottom = mTitleBuffer.buffer[i + 3];
             float height = bottom - top;
-
-            if ((left > mViewPortHandler.contentRight()) || (right < mViewPortHandler.contentLeft())) {
-                continue;
-            }
 
 
             if (mChart.isTitleFixed()) {
@@ -225,6 +207,30 @@ public class SimpleRenderer extends DataRenderer {
 
             }
 
+            column = mChart.getColumnList().get(i/4);
+
+
+            if(column != null && column.isFixed()){
+
+                if(left < mFixedRect.left){
+                    left = mFixedRect.left;
+                    right = left + mTitleBuffer.buffer[i + 2] - mTitleBuffer.buffer[i];
+                    mFixedRect.left += right - left;
+                    clipCount++;
+                }
+//                else if(right > mFixedRect.right){//只支持左侧固定
+//                    right = mFixedRect.right;
+//                    left = right - (mTitleBuffer.buffer[i + 2] - mTitleBuffer.buffer[i]);
+//                    mFixedRect.right -= right - left;
+//
+//                    clipCount++;
+//                }
+
+            }
+
+            if ((left > mViewPortHandler.contentRight()) || (right < mViewPortHandler.contentLeft())) {
+                continue;
+            }
 
             c.drawRect(left, top, right, bottom, mGridPaint);
             mTitleValuePaint.setTextSize(Utils.convertDpToPixel(mChart.getContentFontSize() * mViewPortHandler.getScaleX()));
@@ -232,8 +238,16 @@ public class SimpleRenderer extends DataRenderer {
                     Utils.getTextCenterX(left, right, mValuePaint),
                     Utils.getTextCenterY((top + bottom) / 2, mValuePaint),
                     mTitleBuffer.columnNames[i / 4]);
+            if(clipCount > 0){
+                c.save();
+                c.clipRect(mFixedRect);
+            }
 
 
+        }
+
+        for(int i = 0; i < clipCount; i++){
+            c.restore();
         }
 
 

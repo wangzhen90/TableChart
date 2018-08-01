@@ -49,8 +49,9 @@ public class SimpleTableActivity extends AppCompatActivity {
 
         List<Column> columns = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
+            Column column = new Column(i == 1 ? "标题比较长比较长比较长" + i : "标题" + i,(i==1 || i==10) ? true : false);
 
-            columns.add(new Column(i == 1 ? "标题比较长比较长比较长" + i : "标题" + i));
+            columns.add(column);
         }
 
 
