@@ -56,6 +56,7 @@ public class SimpleRenderer extends DataRenderer {
 
     private RectF mValuesRect = new RectF();
     private RectF mFixedRect = new RectF();
+    private RectF mContentFixedRect = new RectF();
 
     @Override
     public void drawData(Canvas c) {
@@ -66,6 +67,7 @@ public class SimpleRenderer extends DataRenderer {
         mValuesRect.top += mChart.getTitleHeight() * mViewPortHandler.getScaleY();
         int clipRestoreCount = c.save();
         c.clipRect(mValuesRect);
+        mContentFixedRect.set(mValuesRect);
         long startTime = System.currentTimeMillis();
 
         for (int i = 0; i < mChart.getColumnCount(); i++) {
@@ -73,6 +75,10 @@ public class SimpleRenderer extends DataRenderer {
         }
 
 //        Log.e("1------绘制所有column的耗费时间：", (System.currentTimeMillis() - startTime) + "");
+
+        for (int i = 0; i < contentClipCount; i++) {
+            c.restore();
+        }
 
         c.restoreToCount(clipRestoreCount);
 
@@ -83,6 +89,8 @@ public class SimpleRenderer extends DataRenderer {
     //    float[] checkBuffer = new float[]{0,0,0,0};
     RectF checkRect = new RectF();
     private String bgColorBuffer;
+    int contentClipCount = 0;
+
 
     private void drawColumn(Canvas c, Column<ICell> column, int index, RectF visibleRect, List<Column<ICell>> columns) {
 
@@ -91,15 +99,37 @@ public class SimpleRenderer extends DataRenderer {
         }
         if (transformer == null) return;
 
-        ColumnBuffer columnBuffer = mBuffers[index];
+        float left = 0, top, right, bottom;
 
+        boolean isCliped = false;
+
+        ColumnBuffer columnBuffer = mBuffers[index];
+        //过滤掉不需要映射column
         if (columnBuffer.size() >= 4) {
             checkRect.set(column.getPreColumnsWidth(), 0, column.getPreColumnsWidth() + column.getWidth(), 0);
 
             transformer.rectValueToPixel(checkRect);
-            if ((checkRect.left - 10 > visibleRect.right) || (checkRect.right + 10 < visibleRect.left)) {
+            if ((checkRect.left - 10 > visibleRect.right)) {
                 return;
             }
+
+            if (checkRect.right + 10 < visibleRect.left) {
+                if (!column.isFixed()) {
+                    return;
+                }
+            }
+
+
+            if (column.isFixed() && checkRect.left < mContentFixedRect.left) {
+                left = mContentFixedRect.left;
+                mContentFixedRect.left += checkRect.width();
+                contentClipCount++;
+                isCliped = true;
+
+            } else {
+                left = checkRect.left;
+            }
+
         }
 
 
@@ -119,28 +149,38 @@ public class SimpleRenderer extends DataRenderer {
 
         long startTimeDraw = System.currentTimeMillis();
 
+
         for (int i = 0; i < columnBuffer.size(); i += 4) {
 
-            if (columnBuffer.buffer[i + 2] == columnBuffer.buffer[i]) continue;
+            right = columnBuffer.buffer[i + 2];
+            top = columnBuffer.buffer[i + 1];
+            bottom = columnBuffer.buffer[i + 3];
 
-            if ((columnBuffer.buffer[i] > mViewPortHandler.contentRight()) || (columnBuffer.buffer[i + 2] < mViewPortHandler.contentLeft())) {
+
+            //过滤掉不需要绘制的Cell
+            if (left == right) continue;
+
+            if (isCliped) {
+                right = left + columnBuffer.buffer[i + 2] - columnBuffer.buffer[i];
+            }
+
+
+            if ((left > mViewPortHandler.contentRight()) || (right < mViewPortHandler.contentLeft())) {
                 return;
             }
 
-            if (columnBuffer.buffer[i + 3] < (visibleRect.top - (columnBuffer.buffer[i + 3] - columnBuffer.buffer[i + 1])) || columnBuffer.buffer[i + 1] > visibleRect.bottom) {
+            if (bottom < (visibleRect.top - (bottom - top)) || top > visibleRect.bottom) {
                 continue;
             }
 
-            c.drawRect(columnBuffer.buffer[i], columnBuffer.buffer[i + 1], columnBuffer.buffer[i + 2],
-                    columnBuffer.buffer[i + 3], mGridPaint);
+            c.drawRect(left, top, right, bottom, mGridPaint);
 
-            if(mChart.getBgFormatter() != null){
+            if (mChart.getBgFormatter() != null) {
                 bgColorBuffer = mChart.getBgFormatter().getBackgroundColor(column.getData().get(i / 4).getRealCell(), column, columns);
 
-                if(bgColorBuffer != null){
+                if (bgColorBuffer != null) {
                     mBgPaint.setColor(Color.parseColor(bgColorBuffer));
-                    c.drawRect(columnBuffer.buffer[i], columnBuffer.buffer[i + 1], columnBuffer.buffer[i + 2],
-                            columnBuffer.buffer[i + 3], mBgPaint);
+                    c.drawRect(left, top, right, bottom, mBgPaint);
                 }
             }
 
@@ -148,13 +188,20 @@ public class SimpleRenderer extends DataRenderer {
             fillValuePaint(column.getData().get(i / 4).getRealCell(), column, columns);
 
             Utils.drawSingleText(c, mValuePaint,
-                     Utils.getTextCenterX(
-                             columnBuffer.buffer[i] + column.getLeftOffset() * mChart.getViewPortHandler().getScaleX(),
-                             columnBuffer.buffer[i + 2] - column.getRightOffset() * mChart.getViewPortHandler().getScaleX(),
-                             mValuePaint),
-                    Utils.getTextCenterY((columnBuffer.buffer[i + 1] + columnBuffer.buffer[i + 3]) / 2, mValuePaint),
+                    Utils.getTextCenterX(
+                            left + column.getLeftOffset() * mChart.getViewPortHandler().getScaleX(),
+                            right - column.getRightOffset() * mChart.getViewPortHandler().getScaleX(),
+                            mValuePaint),
+                    Utils.getTextCenterY((top + bottom) / 2, mValuePaint),
                     column.getData().get(i / 4).getContents()
             );
+
+
+        }
+
+        if (contentClipCount > 0 && isCliped) {
+            c.save();
+            c.clipRect(mContentFixedRect);
         }
 
 //        Log.e("2------", "column" + index + "的draw耗费时间：" + (System.currentTimeMillis() - startTimeDraw) + "");
@@ -197,7 +244,7 @@ public class SimpleRenderer extends DataRenderer {
             float right = mTitleBuffer.buffer[i + 2];
             float bottom = mTitleBuffer.buffer[i + 3];
             float height = bottom - top;
-
+            boolean isCliped = false;
 
             if (mChart.isTitleFixed()) {
                 if (top < 0) {
@@ -207,16 +254,17 @@ public class SimpleRenderer extends DataRenderer {
 
             }
 
-            column = mChart.getColumnList().get(i/4);
+            column = mChart.getColumnList().get(i / 4);
 
 
-            if(column != null && column.isFixed()){
+            if (column != null && column.isFixed()) {
 
-                if(left < mFixedRect.left){
+                if (left < mFixedRect.left) {
                     left = mFixedRect.left;
                     right = left + mTitleBuffer.buffer[i + 2] - mTitleBuffer.buffer[i];
                     mFixedRect.left += right - left;
                     clipCount++;
+                    isCliped = true;
                 }
 //                else if(right > mFixedRect.right){//只支持左侧固定
 //                    right = mFixedRect.right;
@@ -238,7 +286,7 @@ public class SimpleRenderer extends DataRenderer {
                     Utils.getTextCenterX(left, right, mValuePaint),
                     Utils.getTextCenterY((top + bottom) / 2, mValuePaint),
                     mTitleBuffer.columnNames[i / 4]);
-            if(clipCount > 0){
+            if (clipCount > 0 && isCliped) {
                 c.save();
                 c.clipRect(mFixedRect);
             }
@@ -246,7 +294,7 @@ public class SimpleRenderer extends DataRenderer {
 
         }
 
-        for(int i = 0; i < clipCount; i++){
+        for (int i = 0; i < clipCount; i++) {
             c.restore();
         }
 
