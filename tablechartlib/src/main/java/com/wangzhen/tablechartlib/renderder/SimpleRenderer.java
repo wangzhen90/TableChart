@@ -79,6 +79,7 @@ public class SimpleRenderer extends DataRenderer {
         for (int i = 0; i < contentClipCount; i++) {
             c.restore();
         }
+        contentClipCount = 0;
 
         c.restoreToCount(clipRestoreCount);
 
@@ -123,7 +124,6 @@ public class SimpleRenderer extends DataRenderer {
             if (column.isFixed() && checkRect.left < mContentFixedRect.left) {
                 left = mContentFixedRect.left;
                 mContentFixedRect.left += checkRect.width();
-                contentClipCount++;
                 isCliped = true;
 
             } else {
@@ -199,8 +199,9 @@ public class SimpleRenderer extends DataRenderer {
 
         }
 
-        if (contentClipCount > 0 && isCliped) {
+        if (isCliped) {
             c.save();
+            contentClipCount++;
             c.clipRect(mContentFixedRect);
         }
 
