@@ -28,14 +28,16 @@ public class Sheet<T extends Cell> implements ISheet {
     private List<Column<T>> columns;
     private List<Column<T>> childColumns;
 
+    private List<ICell> sumCells;
+
     private int mHeight;
     private int mWidth;
     private int cellCounts;
 
     private int rowHeight = 70;
 
-    private int columnLeftOffset = 30;
-    private int columnRightOffset = 30;
+    private int columnLeftOffset = (int) Utils.convertDpToPixel(8);
+    private int columnRightOffset = (int) Utils.convertDpToPixel(8);
 
 
     private ArrayList<ICellRange> mergedCells = new ArrayList();
@@ -65,11 +67,25 @@ public class Sheet<T extends Cell> implements ISheet {
 
     }
 
+    public Sheet(List columns, List data,List<ICell> sumCells) {
+
+        this.columns = columns;
+        this.dataList = data;
+        this.sumCells = sumCells;
+        calculate();
+
+        mBgFormatter = new DefaultBgFormatter();
+        mTextFormatter = new DefaultTextFormatter();
+
+    }
+
 
     public void setData(T[][] data) {
         this.data = data;
         calculate();
     }
+
+
 
     public T[][] getData() {
         return data;
@@ -127,8 +143,13 @@ public class Sheet<T extends Cell> implements ISheet {
     }
 
     @Override
-    public int getRowHeight(int var1) {
-        return 0;
+    public int getRowHeight() {
+        return rowHeight;
+    }
+
+    @Override
+    public void setRowHeight(int rowHeight) {
+        this.rowHeight = rowHeight;
     }
 
     @Override
@@ -162,6 +183,11 @@ public class Sheet<T extends Cell> implements ISheet {
 
             mWidth += column.getWidth();
 
+            if(sumCells != null && i < sumCells.size()){
+                column.setSumCell(sumCells.get(i));
+            }
+
+
             if (column.getData() != null) {
                 if (column.getData().size() > maxRowCount) {
                     maxRowCount = column.getData().size();
@@ -175,6 +201,11 @@ public class Sheet<T extends Cell> implements ISheet {
 
         this.maxColumnCount = columns.size();
         this.maxRowCount = maxRowCount;
+
+
+//        if(sumCells != null){
+//            mHeight += rowHeight;
+//        }
 
     }
 
@@ -339,5 +370,9 @@ public class Sheet<T extends Cell> implements ISheet {
 
     public void setBgFormatter(IBgFormatter mBgFormatter) {
         this.mBgFormatter = mBgFormatter;
+    }
+
+    public List<ICell> getSumCells(){
+        return sumCells;
     }
 }

@@ -2,6 +2,7 @@ package com.wangzhen.tablechartlib.component;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
@@ -60,7 +61,6 @@ public class TableChart extends ViewGroup {
     private boolean isTitleFixed = true;
 
     private int titleFontSize = 9;
-    private int contentFontSize = 9;
 
     private float highlightBorderWidth = Utils.convertDpToPixel(5f);
 
@@ -69,6 +69,9 @@ public class TableChart extends ViewGroup {
 
     private ITableOnClickListener onClickListener;
 
+    private int highlightColor = Color.parseColor("#4558C9");
+
+    private int titleValueColor = Color.parseColor("#4D4D4D");
 
     public TableChart(Context context) {
         super(context);
@@ -126,6 +129,8 @@ public class TableChart extends ViewGroup {
         mViewPortHandler.setMaxTransY(sheet.getHeight());
         mViewPortHandler.setMaxTransX(sheet.getWidth());
 
+        calculateOffsets();
+
     }
 
     public ISheet getSheet() {
@@ -141,6 +146,7 @@ public class TableChart extends ViewGroup {
 
         calcMinMax();
 
+        calculateOffsets();
 
     }
 
@@ -150,8 +156,17 @@ public class TableChart extends ViewGroup {
     }
 
 
+    private boolean showSum;
+
     public void calculateOffsets() {
 
+        float offsetLeft = 0f, offsetRight = 0f, offsetTop = 0f, offsetBottom = 0f;
+
+        if(showSum){
+            offsetBottom = sheet.getRowHeight();
+        }
+
+        mViewPortHandler.restrainViewPort(offsetLeft,offsetTop,offsetRight,offsetBottom);
 
     }
 
@@ -206,6 +221,12 @@ public class TableChart extends ViewGroup {
 
         return sheet.getColumnList();
     }
+
+    public List<ICell> getSumCells(){
+
+        return sheet.getSumCells();
+    }
+
 
     public boolean isScaleXEnabled() {
         return scaleXEnable;
@@ -360,17 +381,10 @@ public class TableChart extends ViewGroup {
         return titleFontSize;
     }
 
-    public int getContentFontSize() {
-        return contentFontSize;
-    }
-
     public void setTitleFontSize(int fontSize) {
         this.titleFontSize = fontSize;
     }
 
-    public void setContentFontSize(int fontSize) {
-        this.contentFontSize = fontSize;
-    }
 
     public void highlightValue(Highlight h, boolean callListener) {
 
@@ -428,5 +442,41 @@ public class TableChart extends ViewGroup {
         return null;
     }
 
+    public int getHighlightColor() {
+        return highlightColor;
+    }
+
+    public void setHighlightColor(int highlightColor) {
+        this.highlightColor = highlightColor;
+    }
+
+
+    public int getTitleValueColor() {
+        return titleValueColor;
+    }
+
+    public void setTitleValueColor(int titleValueColor) {
+        this.titleValueColor = titleValueColor;
+    }
+
+    public boolean isShowSum() {
+        return showSum;
+    }
+
+    public void setShowSum(boolean showSum) {
+        this.showSum = showSum;
+    }
+
+
+    public int getRowHeight(){
+
+       return  sheet.getRowHeight();
+
+    }
+
+    public void setRowHeight(int rowHeight){
+
+        sheet.setRowHeight(rowHeight);
+    }
 
 }

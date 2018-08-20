@@ -481,6 +481,9 @@ public class ChartTouchListener extends GestureDetector.SimpleOnGestureListener 
 
         performHighlight(highlight,e);
 
+
+        //如果出现了重叠，那就以优先fixedColumn
+
         return super.onSingleTapUp(e);
     }
 

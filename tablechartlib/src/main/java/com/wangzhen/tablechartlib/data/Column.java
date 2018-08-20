@@ -53,6 +53,8 @@ public class Column<T extends ICell> {
     private int leftOffset;
     private int rightOffset;
 
+    private ICell sumCell;
+
 
     public Column() {
 
@@ -180,5 +182,14 @@ public class Column<T extends ICell> {
 
     public void setFixed(boolean fixed) {
         isFixed = fixed;
+    }
+
+
+    public ICell getSumCell() {
+        return sumCell;
+    }
+
+    public void setSumCell(ICell sumCell) {
+        this.sumCell = sumCell;
     }
 }

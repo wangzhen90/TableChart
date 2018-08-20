@@ -35,7 +35,7 @@ public class ViewPortHandler {
     /**
      * maximum scale value on the y-axis
      */
-    private float mMaxScaleY = Float.MAX_VALUE;
+    private float mMaxScaleY = 2f;
 
     /**
      * minimum scale value on the x-axis
@@ -45,7 +45,7 @@ public class ViewPortHandler {
     /**
      * maximum scale value on the x-axis
      */
-    private float mMaxScaleX = Float.MAX_VALUE;
+    private float mMaxScaleX = 2;
 
     /**
      * contains the current scale factor of the x-axis

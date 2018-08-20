@@ -1,5 +1,6 @@
 package com.wangzhen.tablechart;
 
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextPaint;
@@ -9,6 +10,7 @@ import com.wangzhen.tablechartlib.component.TableChart;
 import com.wangzhen.tablechartlib.data.Cell;
 import com.wangzhen.tablechartlib.data.Column;
 import com.wangzhen.tablechartlib.data.Sheet;
+import com.wangzhen.tablechartlib.formatter.IBgFormatter;
 import com.wangzhen.tablechartlib.formatter.ITextFormatter;
 import com.wangzhen.tablechartlib.interfaces.ICell;
 import com.wangzhen.tablechartlib.interfaces.ITableOnClickListener;
@@ -49,10 +51,17 @@ public class SimpleTableActivity extends AppCompatActivity {
 
         List<Column> columns = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
-            Column column = new Column(i == 1 ? "标题比较长比较长比较长" + i : "标题" + i,(i==1 || i==10) ? true : false);
-//            Column column = new Column(i == 1 ? "标题比较长比较长比较长" + i : "标题" + i);
+//            Column column = new Column(i == 1 ? "标题比较长比较长比较长" + i : "标题" + i,(i==1 || i==10) ? true : false);
+            Column column = new Column(i == 1 ? "标题比较长比较长比较长" + i : "标题" + i);
 
             columns.add(column);
+        }
+
+        List<ICell> sumCells = new ArrayList<>();
+        for (int i = 0; i < 20; i++) {
+
+            sumCells.add(new Cell(-1,i,(i+1000)+""));
+
         }
 
 
@@ -65,7 +74,8 @@ public class SimpleTableActivity extends AppCompatActivity {
             columns.get(i).setData(cells);
         }
 
-        Sheet<Cell> sheet = new Sheet<>(columns, null);
+//        Sheet<Cell> sheet = new Sheet<>(columns, null);
+        Sheet<Cell> sheet = new Sheet<>(columns, null,sumCells);
 
 //        sheet.merge(0, 0, 2, 2);
 //        sheet.merge(5, 0, 5, 1);
@@ -94,10 +104,26 @@ public class SimpleTableActivity extends AppCompatActivity {
                     return "red";
                 }
 
-                return "black";
+                return "#4D4D4D";
             }
         });
 
+
+        sheet.setBgFormatter(new IBgFormatter() {
+            @Override
+            public String getContentBackgroundColor(ICell cell, Column<ICell> column, List<Column<ICell>> columns) {
+                return null;
+            }
+
+            @Override
+            public String getTitleBackgroundColor() {
+                return "#F0F0F0";
+            }
+        });
+
+
+        tableChart.setHighlightColor(Color.parseColor("#4558C9"));
+        tableChart.setShowSum(true);
 
         tableChart.setSheet(sheet);
 

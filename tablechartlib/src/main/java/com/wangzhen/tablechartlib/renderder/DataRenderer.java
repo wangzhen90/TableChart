@@ -3,6 +3,7 @@ package com.wangzhen.tablechartlib.renderder;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 
 import com.wangzhen.tablechartlib.formatter.IValueFormatter;
 
@@ -27,6 +28,8 @@ public abstract class DataRenderer extends Renderer {
 
     protected Paint mBgPaint;
 
+    protected Paint mSumValuePaint;
+
 
 
     public DataRenderer(ViewPortHandler viewPortHandler) {
@@ -37,17 +40,23 @@ public abstract class DataRenderer extends Renderer {
         mValuePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mValuePaint.setTextAlign(Paint.Align.CENTER);
         mValuePaint.setTextSize(Utils.convertDpToPixel(9f));
-        mValuePaint.setColor(Color.parseColor("#000000"));
+        mValuePaint.setColor(Color.parseColor("#4D4D4D"));
 
         mTitleValuePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mTitleValuePaint.setTextAlign(Paint.Align.CENTER);
         mTitleValuePaint.setTextSize(Utils.convertDpToPixel(9f));
-        mTitleValuePaint.setColor(Color.parseColor("#000000"));
+        mTitleValuePaint.setColor(Color.parseColor("#4D4D4D"));
+
+        mSumValuePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mSumValuePaint.setTextAlign(Paint.Align.CENTER);
+        mSumValuePaint.setTextSize(Utils.convertDpToPixel(9f));
+        mSumValuePaint.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.BOLD));
+        mSumValuePaint.setColor(Color.parseColor("#4D4D4D"));
 
 
         mGridPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mGridPaint.setStrokeWidth(1);
-        mGridPaint.setColor(Color.parseColor("#d0d0d0"));
+        mGridPaint.setColor(Color.parseColor("#B3B3B3"));
         mGridPaint.setStyle(Paint.Style.STROKE);
 
         mHighlightPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -66,6 +75,7 @@ public abstract class DataRenderer extends Renderer {
     public abstract void drawData(Canvas c);
     public abstract void drawValues(Canvas c);
     public abstract void drawTitle(Canvas c);
+    public abstract void drawSum(Canvas c);
 
 
     public abstract void drawExtras(Canvas c);

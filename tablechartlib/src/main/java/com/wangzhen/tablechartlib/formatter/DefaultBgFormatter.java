@@ -12,11 +12,16 @@ import java.util.List;
 public class DefaultBgFormatter implements IBgFormatter{
 
     @Override
-    public String getBackgroundColor(ICell cell, Column<ICell> column, List<Column<ICell>> columns) {
+    public String getContentBackgroundColor(ICell cell, Column<ICell> column, List<Column<ICell>> columns) {
         if(cell.getRow() % 2 == 0){
             return null;
         }else{
             return "#C8C2C6";
         }
+    }
+
+    @Override
+    public String getTitleBackgroundColor() {
+        return "#F0F0F0";
     }
 }

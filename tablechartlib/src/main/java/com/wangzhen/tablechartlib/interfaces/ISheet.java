@@ -31,7 +31,9 @@ public interface ISheet<T extends ICell> {
 
     int getColumnWidth(int var1);
 
-    int getRowHeight(int var1);
+    int getRowHeight();
+
+    void setRowHeight(int rowHeight);
 
     int getWidth();
 
@@ -47,5 +49,6 @@ public interface ISheet<T extends ICell> {
     Column<T> getColumnByXValue(double xValue);
     T getCellByTouchPoint(double xValue, double yValue);
 
+    List<ICell> getSumCells();
 
 }

@@ -4,9 +4,11 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.RectF;
 import android.text.TextPaint;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.wangzhen.tablechartlib.buffer.ColumnBuffer;
+import com.wangzhen.tablechartlib.buffer.SumBuffer;
 import com.wangzhen.tablechartlib.buffer.TitleBuffer;
 import com.wangzhen.tablechartlib.component.TableChart;
 import com.wangzhen.tablechartlib.data.Column;
@@ -38,6 +40,7 @@ public class SimpleRenderer extends DataRenderer {
         super(viewPortHandler);
         this.mChart = chart;
         mHighlightPaint.setStrokeWidth(mChart.getHighlightBorderWidth());
+        mHighlightPaint.setColor(mChart.getHighlightColor());
     }
 
     @Override
@@ -46,7 +49,7 @@ public class SimpleRenderer extends DataRenderer {
         List<Column<ICell>> columns = mChart.getColumnList();
         mBuffers = new ColumnBuffer[mChart.getColumnCount()];
         mTitleBuffer = new TitleBuffer(mChart.getColumnCount() * 4, mChart.getColumnCount());
-
+        mSumBuffer = new SumBuffer(mChart.getColumnCount() * 4,mChart.getHeight());
 //        mTitleBuffer.feed(mChart.getColumnList());
         for (int i = 0; i < mChart.getColumnCount(); i++) {
             mBuffers[i] = new ColumnBuffer(columns.get(i).getData().size() * 4);
@@ -176,7 +179,7 @@ public class SimpleRenderer extends DataRenderer {
             c.drawRect(left, top, right, bottom, mGridPaint);
 
             if (mChart.getBgFormatter() != null) {
-                bgColorBuffer = mChart.getBgFormatter().getBackgroundColor(column.getData().get(i / 4).getRealCell(), column, columns);
+                bgColorBuffer = mChart.getBgFormatter().getContentBackgroundColor(column.getData().get(i / 4).getRealCell(), column, columns);
 
                 if (bgColorBuffer != null) {
                     mBgPaint.setColor(Color.parseColor(bgColorBuffer));
@@ -221,6 +224,35 @@ public class SimpleRenderer extends DataRenderer {
     }
 
 
+
+    private void fillTitlePaint(Column column){
+
+        String bgColor = mChart.getBgFormatter().getTitleBackgroundColor();
+        if(mChart.getHighlight() != null && mChart.getHighlight().isTitle() && mChart.getHighlight().getColumnIndex() == column.columnIndex){
+            mBgPaint.setColor(mChart.getHighlightColor());
+            mTitleValuePaint.setColor(Color.parseColor("white"));
+        }else if(!TextUtils.isEmpty(bgColor)){
+            mBgPaint.setColor(Color.parseColor(bgColor));
+            mTitleValuePaint.setColor(mChart.getTitleValueColor());
+        }else{
+            mBgPaint.setColor(Color.TRANSPARENT);
+            mTitleValuePaint.setColor(mChart.getTitleValueColor());
+        }
+    }
+
+
+    private void fillSumPaint(){
+        String bgColor = mChart.getBgFormatter().getTitleBackgroundColor();
+        if(!TextUtils.isEmpty(bgColor)){
+            mBgPaint.setColor(Color.parseColor(bgColor));
+            mTitleValuePaint.setColor(mChart.getTitleValueColor());
+        }else{
+            mBgPaint.setColor(Color.TRANSPARENT);
+            mTitleValuePaint.setColor(mChart.getTitleValueColor());
+        }
+    }
+
+
     @Override
     public void drawValues(Canvas c) {
 
@@ -232,7 +264,15 @@ public class SimpleRenderer extends DataRenderer {
         if (transformer == null) return;
         //优化onDraw执行时间，只在initBuffer中做一次feed
         mTitleBuffer.feed(mChart.getColumnList());
+
         transformer.pointValuesToPixel(mTitleBuffer.buffer);
+
+        if(mChart.isShowSum()){
+            mSumBuffer.feed(mChart.getColumnList());
+            transformer.pointValuesToPixel(mSumBuffer.buffer);
+        }
+
+
 
         Column column;
         int clipCount = 0;
@@ -245,6 +285,7 @@ public class SimpleRenderer extends DataRenderer {
             float right = mTitleBuffer.buffer[i + 2];
             float bottom = mTitleBuffer.buffer[i + 3];
             float height = bottom - top;
+
             boolean isCliped = false;
 
             if (mChart.isTitleFixed()) {
@@ -259,6 +300,11 @@ public class SimpleRenderer extends DataRenderer {
 
 
             if (column != null && column.isFixed()) {
+
+
+                if(mFixedRect.bottom == mViewPortHandler.contentBottom()){
+                    mFixedRect.bottom += column.getRowHeight();
+                }
 
                 if (left < mFixedRect.left) {
                     left = mFixedRect.left;
@@ -280,19 +326,46 @@ public class SimpleRenderer extends DataRenderer {
             if ((left > mViewPortHandler.contentRight()) || (right < mViewPortHandler.contentLeft())) {
                 continue;
             }
+            fillTitlePaint(column);
 
+            c.drawRect(left, top, right, bottom, mBgPaint);
             c.drawRect(left, top, right, bottom, mGridPaint);
-            mTitleValuePaint.setTextSize(Utils.convertDpToPixel(mChart.getContentFontSize() * mViewPortHandler.getScaleX()));
+            mTitleValuePaint.setTextSize(Utils.convertDpToPixel(mChart.getTitleFontSize() * mViewPortHandler.getScaleX()));
             Utils.drawSingleText(c, mTitleValuePaint,
                     Utils.getTextCenterX(left, right, mValuePaint),
                     Utils.getTextCenterY((top + bottom) / 2, mValuePaint),
                     mTitleBuffer.columnNames[i / 4]);
+
+            if(mChart.isShowSum()){
+
+                float sumTop,sumBottom;
+
+                sumBottom = mSumBuffer.buffer[i+3];
+
+
+                if(sumBottom != mChart.getHeight()){
+                    sumBottom = mChart.getHeight();
+                }
+                sumTop = sumBottom - mChart.getRowHeight();
+
+
+                fillSumPaint();
+                c.drawRect(left, sumTop, right, sumBottom, mBgPaint);
+                c.drawRect(left, sumTop, right, sumBottom, mGridPaint);
+
+                mSumValuePaint.setTextSize(Utils.convertDpToPixel(mChart.getTitleFontSize()));
+
+                Utils.drawSingleText(c, mSumValuePaint,
+                        Utils.getTextCenterX(left, right, mValuePaint),
+                        Utils.getTextCenterY((sumTop + sumBottom) / 2, mValuePaint),
+                        column.getSumCell() != null ? column.getSumCell().getContents() : null);
+            }
+
+
             if (clipCount > 0 && isCliped) {
                 c.save();
                 c.clipRect(mFixedRect);
             }
-
-
         }
 
         for (int i = 0; i < clipCount; i++) {
@@ -302,8 +375,64 @@ public class SimpleRenderer extends DataRenderer {
 
     }
 
+    private SumBuffer mSumBuffer;
+
+    @Override
+    public void drawSum(Canvas c) {
+//        if(mChart.isShowSum()){
+//            mSumBuffer.feed(mChart.getColumnList());
+//
+//            transformer = mChart.getTransformer();
+//            if (transformer == null) return;
+//            mSumBuffer.feed(mChart.getColumnList());
+//            ICell sumCell;
+//            Column<ICell> column;
+//            for(int i = 0; i < mSumBuffer.buffer.length; i+=4){
+//
+//                float left = mTitleBuffer.buffer[i];
+//                float top = mTitleBuffer.buffer[i + 1];
+//                float right = mTitleBuffer.buffer[i + 2];
+//                float bottom = mTitleBuffer.buffer[i + 3];
+//                float height = bottom - top;
+//                boolean isCliped = false;
+//
+//                column = mChart.getColumnList().get(i / 4);
+//
+//                if (column != null && column.isFixed()) {
+//
+//                    if (left < mFixedRect.left) {
+//                        left = mFixedRect.left;
+//                        right = left + mTitleBuffer.buffer[i + 2] - mTitleBuffer.buffer[i];
+//                        mFixedRect.left += right - left;
+//                        clipCount++;
+//                        isCliped = true;
+//                    }
+////                else if(right > mFixedRect.right){//只支持左侧固定
+////                    right = mFixedRect.right;
+////                    left = right - (mTitleBuffer.buffer[i + 2] - mTitleBuffer.buffer[i]);
+////                    mFixedRect.right -= right - left;
+////
+////                    clipCount++;
+////                }
+//
+//                }
+//
+//                if(mSumBuffer.buffer[i] > mViewPortHandler.contentRight()){
+//                    continue;
+//                }
+//
+//
+//
+//            }
+//
+//
+//        }
+    }
+
     @Override
     public void drawExtras(Canvas c) {
+
+
 
     }
 
@@ -315,8 +444,18 @@ public class SimpleRenderer extends DataRenderer {
             if (transformer == null) return;
             RectF hRect = highlight.getRect();
             int clipRestoreCount = c.save();
+
+            int bottomExtra = mChart.isShowSum() ? mChart.getRowHeight() : 0;
+
             if (highlight.isTitle() && mChart.isTitleFixed()) {
-                c.clipRect(mChart.getViewPortHandler().getContentRect());
+
+//                c.clipRect(mChart.getViewPortHandler().getContentRect());
+                c.clipRect(mChart.getViewPortHandler().contentLeft(),
+                        mChart.getViewPortHandler().contentTop(),
+                        mChart.getViewPortHandler().contentRight(),
+                        mChart.getViewPortHandler().contentBottom() + bottomExtra);
+                hRect.bottom += bottomExtra;
+
             } else {
                 mValuesRect.set(mViewPortHandler.getContentRect());
                 mValuesRect.top += mChart.getTitleHeight() * mViewPortHandler.getScaleY();
@@ -334,4 +473,8 @@ public class SimpleRenderer extends DataRenderer {
             c.restoreToCount(clipRestoreCount);
         }
     }
+
+
+
+
 }
