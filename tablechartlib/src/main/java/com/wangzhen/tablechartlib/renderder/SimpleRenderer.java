@@ -68,6 +68,8 @@ public class SimpleRenderer extends DataRenderer {
 
         mValuesRect.set(mViewPortHandler.getContentRect());
         mValuesRect.top += mChart.getTitleHeight() * mViewPortHandler.getScaleY();
+
+        mValuesRect.bottom -= mChart.getRowHeight() * mViewPortHandler.getScaleY();
         int clipRestoreCount = c.save();
         c.clipRect(mValuesRect);
         mContentFixedRect.set(mValuesRect);
@@ -338,22 +340,22 @@ public class SimpleRenderer extends DataRenderer {
 
             if(mChart.isShowSum()){
 
-                float sumTop,sumBottom;
-
+                float sumTop,sumBottom,sumHeight;
+                sumHeight = mSumBuffer.buffer[i+3] - mSumBuffer.buffer[i+1];
                 sumBottom = mSumBuffer.buffer[i+3];
 
 
                 if(sumBottom != mChart.getHeight()){
                     sumBottom = mChart.getHeight();
                 }
-                sumTop = sumBottom - mChart.getRowHeight();
+                sumTop = sumBottom - sumHeight;
 
 
                 fillSumPaint();
                 c.drawRect(left, sumTop, right, sumBottom, mBgPaint);
                 c.drawRect(left, sumTop, right, sumBottom, mGridPaint);
 
-                mSumValuePaint.setTextSize(Utils.convertDpToPixel(mChart.getTitleFontSize()));
+                mSumValuePaint.setTextSize(Utils.convertDpToPixel(mChart.getTitleFontSize() * mViewPortHandler.getScaleY()));
 
                 Utils.drawSingleText(c, mSumValuePaint,
                         Utils.getTextCenterX(left, right, mValuePaint),

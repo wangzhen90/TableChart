@@ -160,13 +160,13 @@ public class TableChart extends ViewGroup {
 
     public void calculateOffsets() {
 
-        float offsetLeft = 0f, offsetRight = 0f, offsetTop = 0f, offsetBottom = 0f;
-
-        if(showSum){
-            offsetBottom = sheet.getRowHeight();
-        }
-
-        mViewPortHandler.restrainViewPort(offsetLeft,offsetTop,offsetRight,offsetBottom);
+//        float offsetLeft = 0f, offsetRight = 0f, offsetTop = 0f, offsetBottom = 0f;
+//
+//        if(showSum){
+//            offsetBottom = sheet.getRowHeight();
+//        }
+//
+//        mViewPortHandler.restrainViewPort(offsetLeft,offsetTop,offsetRight,offsetBottom);
 
     }
 

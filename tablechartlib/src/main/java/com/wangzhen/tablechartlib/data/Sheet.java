@@ -203,9 +203,9 @@ public class Sheet<T extends Cell> implements ISheet {
         this.maxRowCount = maxRowCount;
 
 
-//        if(sumCells != null){
-//            mHeight += rowHeight;
-//        }
+        if(sumCells != null){
+            mHeight += rowHeight;
+        }
 
     }
 

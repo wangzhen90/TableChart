@@ -449,6 +449,11 @@ public class ChartTouchListener extends GestureDetector.SimpleOnGestureListener 
     public boolean onSingleTapUp(MotionEvent e) {
 
 
+
+        if(e.getY() >= mChart.getHeight() - mChart.getRowHeight() * mChart.getViewPortHandler().getScaleY()){
+            return true;
+        }
+
         Log.e("18========","event.x" + e.getX() + ",event.y:"+e.getY());
         Transformer transformer = mChart.getTransformer();
 
