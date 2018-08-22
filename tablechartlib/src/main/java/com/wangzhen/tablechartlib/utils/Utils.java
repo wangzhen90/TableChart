@@ -19,6 +19,7 @@ import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.ViewGroup;
 
 import com.wangzhen.tablechartlib.formatter.DefaultValueFormatter;
 import com.wangzhen.tablechartlib.formatter.IValueFormatter;
@@ -823,5 +824,37 @@ public abstract class Utils {
 
         return centerY - ((paint.descent() + paint.ascent()) / 2);
     }
+
+    public static int measureViewWidth(View chart){
+
+        ViewGroup.LayoutParams lp = chart.getLayoutParams();
+
+        if(lp == null){
+            return 0;
+        }
+
+        int width,height;
+        if (lp.width > 0) {
+            // xml文件中设置了该view的准确宽度值，例如android:layout_width="150dp"
+            width = View.MeasureSpec.makeMeasureSpec(lp.width, View.MeasureSpec.EXACTLY);
+        } else {
+            // xml文件中使用wrap_content设定该view宽度，例如android:layout_width="wrap_content"
+            width = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+        }
+
+        if (lp.height > 0) {
+            // xml文件中设置了该view的准确高度值，例如android:layout_height="50dp"
+            height = View.MeasureSpec.makeMeasureSpec(lp.height, View.MeasureSpec.EXACTLY);
+        } else {
+            // xml文件中使用wrap_content设定该view高度，例如android:layout_height="wrap_content"
+            height = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+        }
+
+        chart.measure(width, height);
+
+
+        return chart.getMeasuredWidth();
+    }
+
 
 }

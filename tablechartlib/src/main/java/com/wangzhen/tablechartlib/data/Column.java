@@ -126,6 +126,10 @@ public class Column<T extends ICell> {
 //        return 200;
     }
 
+    public void setWidth(int width){
+        this.columnWidth = width;
+    }
+
     public int getTitleHeight() {
         return titleHeight;
     }

@@ -14,6 +14,7 @@ import com.wangzhen.tablechartlib.formatter.IBgFormatter;
 import com.wangzhen.tablechartlib.formatter.ITextFormatter;
 import com.wangzhen.tablechartlib.interfaces.ICell;
 import com.wangzhen.tablechartlib.interfaces.ITableOnClickListener;
+import com.wangzhen.tablechartlib.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +51,7 @@ public class SimpleTableActivity extends AppCompatActivity {
     void initData() {
 
         List<Column> columns = new ArrayList<>();
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 3; i++) {
 //            Column column = new Column(i == 1 ? "标题比较长比较长比较长" + i : "标题" + i,(i==1 || i==10) ? true : false);
             Column column = new Column(i == 1 ? "标题比较长比较长比较长" + i : "标题" + i);
 
@@ -58,7 +59,7 @@ public class SimpleTableActivity extends AppCompatActivity {
         }
 
         List<ICell> sumCells = new ArrayList<>();
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 3; i++) {
 
             sumCells.add(new Cell(-1,i,(i+1000)+""));
 
@@ -75,7 +76,7 @@ public class SimpleTableActivity extends AppCompatActivity {
         }
 
 //        Sheet<Cell> sheet = new Sheet<>(columns, null);
-        Sheet<Cell> sheet = new Sheet<>(columns, null,sumCells);
+        Sheet<Cell> sheet = new Sheet<>(columns, Utils.measureViewWidth(tableChart),sumCells);
 
 //        sheet.merge(0, 0, 2, 2);
 //        sheet.merge(5, 0, 5, 1);
@@ -128,4 +129,5 @@ public class SimpleTableActivity extends AppCompatActivity {
         tableChart.setSheet(sheet);
 
     }
+
 }

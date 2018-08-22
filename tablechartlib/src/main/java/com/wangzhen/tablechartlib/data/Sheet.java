@@ -2,6 +2,7 @@ package com.wangzhen.tablechartlib.data;
 
 import android.util.Log;
 
+import com.wangzhen.tablechartlib.component.TableChart;
 import com.wangzhen.tablechartlib.formatter.DefaultBgFormatter;
 import com.wangzhen.tablechartlib.formatter.DefaultTextFormatter;
 import com.wangzhen.tablechartlib.formatter.IBgFormatter;
@@ -52,7 +53,20 @@ public class Sheet<T extends Cell> implements ISheet {
     private ITextFormatter mTextFormatter;
     private IBgFormatter mBgFormatter;
 
+    private int viewWidth;
 
+
+    public Sheet(List columns, int viewWidth) {
+
+        this.columns = columns;
+        this.viewWidth = viewWidth;
+
+        calculate();
+
+        mBgFormatter = new DefaultBgFormatter();
+        mTextFormatter = new DefaultTextFormatter();
+
+    }
 
 
     public Sheet(List columns, List data) {
@@ -67,10 +81,11 @@ public class Sheet<T extends Cell> implements ISheet {
 
     }
 
-    public Sheet(List columns, List data,List<ICell> sumCells) {
+    public Sheet(List columns, int viewWidth,List<ICell> sumCells) {
 
         this.columns = columns;
-        this.dataList = data;
+        this.viewWidth = viewWidth;
+
         this.sumCells = sumCells;
         calculate();
 
@@ -195,6 +210,10 @@ public class Sheet<T extends Cell> implements ISheet {
             }
         }
 
+        checkColumnWidth(this.mWidth < viewWidth,columns);
+
+
+
         mHeight = maxRowCount * rowHeight + mTitleHeight;
 
         cellCounts = maxRowCount * getColumns();
@@ -207,6 +226,24 @@ public class Sheet<T extends Cell> implements ISheet {
             mHeight += rowHeight;
         }
 
+    }
+
+
+    private void checkColumnWidth(boolean shouldResize,List<Column<T>> columns){
+
+
+        if(columns.size() == 0 || !shouldResize) return;
+
+        int extraWidth = (viewWidth - mWidth)/columns.size();
+
+        for(int i = 0; i < columns.size(); i++){
+            Column column = columns.get(i);
+
+            column.setPreColumnsWidth(column.getPreColumnsWidth() + extraWidth * i);
+            column.setWidth(column.getWidth()+extraWidth);
+            mWidth += extraWidth;
+
+        }
     }
 
 

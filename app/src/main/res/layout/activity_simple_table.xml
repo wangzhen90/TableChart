@@ -9,7 +9,7 @@
 
     <com.wangzhen.tablechartlib.component.TableChart
         android:id="@+id/tableView"
-        android:layout_width="match_parent"
+        android:layout_width="360dp"
         android:layout_height="300dp"
         android:background="@android:color/white"/>
 
