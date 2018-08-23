@@ -53,7 +53,7 @@ public class Sheet<T extends Cell> implements ISheet {
 
     private ITextFormatter mTextFormatter;
     private IBgFormatter mBgFormatter;
-    private IValueFormatter mValueFormatter;
+    private IValueFormatter mValueFormatter;//不设置默认值
 
     private int viewWidth;
 
@@ -253,6 +253,8 @@ public class Sheet<T extends Cell> implements ISheet {
 
         int extraWidth = (viewWidth - mWidth)/columns.size();
 
+        if(extraWidth <= 0) return;
+
         for(int i = 0; i < columns.size(); i++){
             Column column = columns.get(i);
 
@@ -428,5 +430,13 @@ public class Sheet<T extends Cell> implements ISheet {
 
     public List<ICell> getSumCells(){
         return sumCells;
+    }
+
+    public IValueFormatter getValueFormatter() {
+        return mValueFormatter;
+    }
+
+    public void setValueFormatter(IValueFormatter mValueFormatter) {
+        this.mValueFormatter = mValueFormatter;
     }
 }

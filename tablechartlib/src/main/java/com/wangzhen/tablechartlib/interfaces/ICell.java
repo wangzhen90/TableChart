@@ -12,6 +12,7 @@ public interface ICell {
     int getColumn();
 
     int getLastRow();
+
     int getLastColumn();
 
 
@@ -24,7 +25,17 @@ public interface ICell {
     ICell getRealCell();
 
     String getFormatValue();
+
     void setFormatValue(String value);
+
+    String getTextColor();
+
+    void setTextColor(String color);
+
+    String getBgColor();
+
+    void setBgColor(String color);
+
 
 //
 //    CellFormat getCellFormat();

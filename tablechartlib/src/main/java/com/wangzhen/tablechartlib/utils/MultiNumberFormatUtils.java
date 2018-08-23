@@ -1,7 +1,9 @@
-package com.wangzhen.tablechartlib.formatter;
+package com.wangzhen.tablechartlib.utils;
 
 
 import com.wangzhen.tablechartlib.data.Column;
+import com.wangzhen.tablechartlib.formatter.BiFormatResult;
+import com.wangzhen.tablechartlib.formatter.BiFormatSet;
 import com.wangzhen.tablechartlib.interfaces.ICell;
 
 import java.text.DecimalFormat;
@@ -15,7 +17,7 @@ import java.util.HashMap;
  * ③添加符号位，添加前后缀
  */
 
-public class MultiNumberFormatter {
+public class MultiNumberFormatUtils {
 
     BiFormatSet mFormatSet;
     protected DecimalFormat mFormat;
@@ -57,7 +59,7 @@ public class MultiNumberFormatter {
     private static HashMap<String, Unit> unitMap = new HashMap<>();
 
 
-    public MultiNumberFormatter(BiFormatSet formatSet) {
+    public MultiNumberFormatUtils(BiFormatSet formatSet) {
         this.mFormatSet = formatSet;
         unitMap.put("K", new Unit("K", "K", (float)Math.pow(10, 3)));
         unitMap.put("M", new Unit("M", "M", (float)Math.pow(10, 6)));
@@ -114,7 +116,7 @@ public class MultiNumberFormatter {
 
 
 
-    DecimalFormat getFormatter(BiFormatSet formatSet) {
+    private DecimalFormat getFormatter(BiFormatSet formatSet) {
 
         switch (formatSet.formatType) {
 
@@ -145,7 +147,7 @@ public class MultiNumberFormatter {
 
     }
 
-    String getFormatPattern(BiFormatSet formatSet){
+    private String getFormatPattern(BiFormatSet formatSet){
 
         StringBuffer b = new StringBuffer();
         for (int i = 0; i < formatSet.decimalDigitsNum; i++) {
@@ -162,7 +164,7 @@ public class MultiNumberFormatter {
     }
 
 
-    public void getUnitAuto(BiFormatSet formatSet, BiFormatResult result) {
+    private void getUnitAuto(BiFormatSet formatSet, BiFormatResult result) {
 
         Unit[] unitMap = getUnitMap(formatSet.language);
         for (int i = 0; i < unitMap.length; i++) {
@@ -184,7 +186,7 @@ public class MultiNumberFormatter {
     }
 
 
-    public void getUnit(BiFormatSet formatSet, BiFormatResult result){
+    private void getUnit(BiFormatSet formatSet, BiFormatResult result){
 //        if (!TextUtils.isEmpty(formatSet.unitSet)) {
         if (formatSet.unitSet != null && !formatSet.unitSet.equals("")) {
 
@@ -203,7 +205,7 @@ public class MultiNumberFormatter {
         }
     }
 
-    public Unit[] getUnitMap(String language) {
+    private Unit[] getUnitMap(String language) {
 
         return language.equals("zh") ? ZH_Unit : EN_Unit;
     }
@@ -233,5 +235,7 @@ public class MultiNumberFormatter {
         //将格式嵌入文本
         System.out.println(new DecimalFormat("光速大小为每秒,###米").format(c)); //光速大小为每秒299,792,458米
     }
+
+
 
 }

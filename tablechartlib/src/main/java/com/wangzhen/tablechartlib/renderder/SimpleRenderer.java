@@ -198,7 +198,9 @@ public class SimpleRenderer extends DataRenderer {
                             right - column.getRightOffset() * mChart.getViewPortHandler().getScaleX(),
                             mValuePaint),
                     Utils.getTextCenterY((top + bottom) / 2, mValuePaint),
-                    column.getData().get(i / 4).getContents()
+                    mChart.getValueFormatter() != null ?
+                            mChart.getValueFormatter().getFormattedValue(column.getData().get(i / 4).getRealCell(), column, columns)
+                            : column.getData().get(i / 4).getRealCell().getContents()
             );
 
 

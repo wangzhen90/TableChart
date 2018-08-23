@@ -3,10 +3,12 @@ package com.wangzhen.tablechartlib.formatter;
 
 
 import com.wangzhen.tablechartlib.data.Cell;
+import com.wangzhen.tablechartlib.data.Column;
 import com.wangzhen.tablechartlib.interfaces.ICell;
 import com.wangzhen.tablechartlib.utils.ViewPortHandler;
 
 import java.text.DecimalFormat;
+import java.util.List;
 
 /**
  * Default formatter used for formatting values inside the chart. Uses a DecimalFormat with
@@ -63,8 +65,9 @@ public class DefaultValueFormatter implements IValueFormatter
         return mDecimalDigits;
     }
 
+
     @Override
-    public String getFormattedValue(float value, Cell entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
+    public String getFormattedValue(ICell cell, Column<ICell> column, List<Column<ICell>> columns) {
         return null;
     }
 }

@@ -67,4 +67,34 @@ public class EmptyCell implements ICell {
     public ICell getRealCell() {
         return realCell;
     }
+
+    @Override
+    public String getFormatValue() {
+        return null;
+    }
+
+    @Override
+    public void setFormatValue(String value) {
+
+    }
+
+    @Override
+    public String getTextColor() {
+        return null;
+    }
+
+    @Override
+    public void setTextColor(String color) {
+
+    }
+
+    @Override
+    public String getBgColor() {
+        return null;
+    }
+
+    @Override
+    public void setBgColor(String color) {
+
+    }
 }

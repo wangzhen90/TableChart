@@ -17,6 +17,10 @@ public class Cell implements ICell {
     //TODO 添加formatter
     private String formatValue;
 
+    private String fontColor;
+    private String bgColor;
+
+
     public Cell(int row, int column, String contents) {
         this.row = row;
         this.column = column;
@@ -92,5 +96,25 @@ public class Cell implements ICell {
 
     public void setFormatValue(String formatValue) {
         this.formatValue = formatValue;
+    }
+
+    @Override
+    public String getTextColor() {
+        return fontColor;
+    }
+
+    @Override
+    public void setTextColor(String color) {
+        this.fontColor = color;
+    }
+
+    @Override
+    public String getBgColor() {
+        return bgColor;
+    }
+
+    @Override
+    public void setBgColor(String color) {
+        this.bgColor = color;
     }
 }

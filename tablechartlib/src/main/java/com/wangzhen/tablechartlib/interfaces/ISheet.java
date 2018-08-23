@@ -4,6 +4,7 @@ import com.wangzhen.tablechartlib.data.Cell;
 import com.wangzhen.tablechartlib.data.Column;
 import com.wangzhen.tablechartlib.formatter.IBgFormatter;
 import com.wangzhen.tablechartlib.formatter.ITextFormatter;
+import com.wangzhen.tablechartlib.formatter.IValueFormatter;
 
 import java.util.List;
 
@@ -48,6 +49,8 @@ public interface ISheet<T extends ICell> {
 
     ITextFormatter getTextFormatter();
     IBgFormatter getBgFormatter();
+
+    IValueFormatter getValueFormatter();
 
     Column<T> getColumnByXValue(double xValue);
     T getCellByTouchPoint(double xValue, double yValue);

@@ -10,8 +10,13 @@ import com.wangzhen.tablechartlib.component.TableChart;
 import com.wangzhen.tablechartlib.data.Cell;
 import com.wangzhen.tablechartlib.data.Column;
 import com.wangzhen.tablechartlib.data.Sheet;
+import com.wangzhen.tablechartlib.formatter.BiColorFormatSet;
+import com.wangzhen.tablechartlib.formatter.BiFormatSet;
 import com.wangzhen.tablechartlib.formatter.IBgFormatter;
 import com.wangzhen.tablechartlib.formatter.ITextFormatter;
+import com.wangzhen.tablechartlib.formatter.IValueFormatter;
+import com.wangzhen.tablechartlib.utils.MultiColorFormatUtils;
+import com.wangzhen.tablechartlib.utils.MultiNumberFormatUtils;
 import com.wangzhen.tablechartlib.interfaces.ICell;
 import com.wangzhen.tablechartlib.interfaces.ITableOnClickListener;
 import com.wangzhen.tablechartlib.utils.Utils;
@@ -51,8 +56,8 @@ public class SimpleTableActivity extends AppCompatActivity {
 
     void initData() {
 
-        List<Column> columns = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
+        final List<Column> columns = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
 //            Column column = new Column(i == 1 ? "标题比较长比较长比较长" + i : "标题" + i,(i==1 || i==10) ? true : false);
             Column column = new Column(i == 1 ? "标题比较长比较长比较长" + i : "标题" + i);
 
@@ -60,7 +65,7 @@ public class SimpleTableActivity extends AppCompatActivity {
         }
 
         List<ICell> sumCells = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 10; i++) {
 
             sumCells.add(new Cell(-1,i,(i+1000)+""));
 
@@ -70,7 +75,7 @@ public class SimpleTableActivity extends AppCompatActivity {
         for (int i = 0; i < columns.size(); i++) {
             List<Cell> cells = new ArrayList<>();
             for (int j = 0; j < 20; j++) {
-                cells.add(new Cell(j, i, "内容" + i + "-" + j));
+                cells.add(new Cell(j, i, i == 0 ? "11111111hahahahah":(j*200)+""));
             }
 
             columns.get(i).setData(cells);
@@ -83,6 +88,22 @@ public class SimpleTableActivity extends AppCompatActivity {
 //        sheet.merge(0, 0, 2, 2);
 //        sheet.merge(5, 0, 5, 1);
 //        sheet.merge(6, 2, 7, 3);
+
+        List<BiColorFormatSet> colorSets = new ArrayList<>();
+
+        colorSets.add(new BiColorFormatSet(MultiColorFormatUtils.OPERATOR_GREAER_THAN,"blue",
+                "#E15E62",500,0));
+
+        colorSets.add(new BiColorFormatSet(MultiColorFormatUtils.OPERATOR_RANGE,"red",
+                "#FF8106",500,800));
+
+
+        colorSets.add(new BiColorFormatSet(MultiColorFormatUtils.OPERATOR_LESS_THAN_OR_EQUAL,"blue",
+                "#4558C9",600,0));
+
+
+        final MultiColorFormatUtils colorFormatUtils = new MultiColorFormatUtils(colorSets,"#4D4D4D",null);
+
 
         sheet.setTextFormatter(new ITextFormatter() {
             @Override
@@ -103,11 +124,7 @@ public class SimpleTableActivity extends AppCompatActivity {
             @Override
             public String getTextColor(ICell cell, Column<ICell> column, List<Column<ICell>> columns) {
 
-                if(cell.getContents().equals("内容1-3")){
-                    return "red";
-                }
-
-                return "#4D4D4D";
+                return colorFormatUtils.getTextColor(cell,column);
             }
         });
 
@@ -115,16 +132,44 @@ public class SimpleTableActivity extends AppCompatActivity {
         sheet.setBgFormatter(new IBgFormatter() {
             @Override
             public String getContentBackgroundColor(ICell cell, Column<ICell> column, List<Column<ICell>> columns) {
-                return null;
+                return colorFormatUtils.getTextBgColor(cell,column);
             }
 
             @Override
             public String getTitleBackgroundColor() {
-                return "#F0F0F0";
+                return "#aaF0F0F0";
             }
         });
 
 
+        final BiFormatSet biFormatSet = new BiFormatSet();
+
+        biFormatSet.unitSet = "auto";
+
+        biFormatSet.decimalDigitsNum = 3;
+
+        biFormatSet.formatType = "commonValue";
+
+        biFormatSet.positiveSign = 1;
+
+        biFormatSet.thousandsSeparator = 1;
+
+
+        final MultiNumberFormatUtils multiNumberFormatter = new MultiNumberFormatUtils(biFormatSet);
+
+        final int divideIndex = 1;
+
+        sheet.setValueFormatter(new IValueFormatter() {
+            @Override
+            public String getFormattedValue(ICell cell, Column<ICell> column, List<Column<ICell>> columns) {
+
+                if(column.columnIndex >= divideIndex){
+                    return multiNumberFormatter.getFormattedValue(cell,column);
+                }else{
+                    return cell.getContents();
+                }
+            }
+        });
 
 
         tableChart.setHighlightColor(Color.parseColor("#4558C9"));

@@ -14,6 +14,7 @@ import com.wangzhen.tablechartlib.data.Column;
 import com.wangzhen.tablechartlib.data.EmptyCell;
 import com.wangzhen.tablechartlib.data.Sheet;
 import com.wangzhen.tablechartlib.formatter.IBgFormatter;
+import com.wangzhen.tablechartlib.formatter.IValueFormatter;
 import com.wangzhen.tablechartlib.highlight.Highlight;
 import com.wangzhen.tablechartlib.interfaces.ICell;
 import com.wangzhen.tablechartlib.interfaces.ISheet;
@@ -478,6 +479,11 @@ public class TableChart extends ViewGroup {
     public void setRowHeight(int rowHeight){
 
         sheet.setRowHeight(rowHeight);
+    }
+
+    public IValueFormatter getValueFormatter(){
+
+        return sheet.getValueFormatter();
     }
 
 }

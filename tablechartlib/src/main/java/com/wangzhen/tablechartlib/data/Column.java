@@ -103,7 +103,7 @@ public class Column<T extends ICell> {
                 cellContent = datas.get(i).getContents();
                 if(cellContent.length() > longestString.length()){
                     longestString = cellContent;
-                    cellWidth = Utils.calcTextWidth(Utils.paint,cellContent);
+                    cellWidth = Utils.calcTextWidth(Utils.paint,longestString);
                 }
             }
         }
