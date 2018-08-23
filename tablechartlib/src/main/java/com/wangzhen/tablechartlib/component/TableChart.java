@@ -126,11 +126,7 @@ public class TableChart extends ViewGroup {
 
     public void setSheet(ISheet sheet) {
         this.sheet = sheet;
-        mViewPortHandler.setMaxTransY(sheet.getHeight());
-        mViewPortHandler.setMaxTransX(sheet.getWidth());
-
-        calculateOffsets();
-
+        notifyDataSetChanged();
     }
 
     public ISheet getSheet() {
@@ -143,6 +139,8 @@ public class TableChart extends ViewGroup {
         if (mDataRenderer != null) {
             mDataRenderer.initBuffers();
         }
+        sheet.setViewWidth(getMeasuredWidth());
+        sheet.calculate();
 
         calcMinMax();
 
@@ -159,6 +157,9 @@ public class TableChart extends ViewGroup {
     private boolean showSum;
 
     public void calculateOffsets() {
+
+        mViewPortHandler.setMaxTransY(sheet.getHeight());
+        mViewPortHandler.setMaxTransX(sheet.getWidth());
 
 //        float offsetLeft = 0f, offsetRight = 0f, offsetTop = 0f, offsetBottom = 0f;
 //
@@ -470,7 +471,7 @@ public class TableChart extends ViewGroup {
 
     public int getRowHeight(){
 
-       return  sheet.getRowHeight();
+        return  sheet.getRowHeight();
 
     }
 

@@ -41,6 +41,9 @@ public interface ISheet<T extends ICell> {
 
     void calculate();
 
+    //用于列数较少无法占满全屏
+    void setViewWidth(int viewWidth);
+
     boolean hasMergedCell();
 
     ITextFormatter getTextFormatter();

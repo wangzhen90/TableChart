@@ -15,7 +15,7 @@ public class Cell implements ICell {
 
     private String contents;
     //TODO 添加formatter
-
+    private String formatValue;
 
     public Cell(int row, int column, String contents) {
         this.row = row;
@@ -76,6 +76,12 @@ public class Cell implements ICell {
         return this;
     }
 
+    @Override
+    public String getFormatValue() {
+
+        return formatValue;
+    }
+
     public void setLastRow(int lastRow){
         this.lastRow = lastRow;
     }
@@ -84,4 +90,7 @@ public class Cell implements ICell {
         this.lastColumn = lastColumn;
     }
 
+    public void setFormatValue(String formatValue) {
+        this.formatValue = formatValue;
+    }
 }

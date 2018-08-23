@@ -7,6 +7,7 @@ import com.wangzhen.tablechartlib.formatter.DefaultBgFormatter;
 import com.wangzhen.tablechartlib.formatter.DefaultTextFormatter;
 import com.wangzhen.tablechartlib.formatter.IBgFormatter;
 import com.wangzhen.tablechartlib.formatter.ITextFormatter;
+import com.wangzhen.tablechartlib.formatter.IValueFormatter;
 import com.wangzhen.tablechartlib.interfaces.ICellRange;
 import com.wangzhen.tablechartlib.interfaces.ISheet;
 import com.wangzhen.tablechartlib.interfaces.ICell;
@@ -52,6 +53,7 @@ public class Sheet<T extends Cell> implements ISheet {
 
     private ITextFormatter mTextFormatter;
     private IBgFormatter mBgFormatter;
+    private IValueFormatter mValueFormatter;
 
     private int viewWidth;
 
@@ -69,12 +71,23 @@ public class Sheet<T extends Cell> implements ISheet {
     }
 
 
-    public Sheet(List columns, List data) {
+//    public Sheet(List columns, List data) {
+//
+//        this.columns = columns;
+//        this.dataList = data;
+//
+//        calculate();
+//
+//        mBgFormatter = new DefaultBgFormatter();
+//        mTextFormatter = new DefaultTextFormatter();
+//
+//    }
+
+    public Sheet(List columns, List<ICell> sumCells) {
 
         this.columns = columns;
-        this.dataList = data;
 
-        calculate();
+        this.sumCells = sumCells;
 
         mBgFormatter = new DefaultBgFormatter();
         mTextFormatter = new DefaultTextFormatter();
@@ -87,7 +100,6 @@ public class Sheet<T extends Cell> implements ISheet {
         this.viewWidth = viewWidth;
 
         this.sumCells = sumCells;
-        calculate();
 
         mBgFormatter = new DefaultBgFormatter();
         mTextFormatter = new DefaultTextFormatter();
@@ -226,6 +238,11 @@ public class Sheet<T extends Cell> implements ISheet {
             mHeight += rowHeight;
         }
 
+    }
+
+    @Override
+    public void setViewWidth(int viewWidth) {
+        this.viewWidth = viewWidth;
     }
 
 

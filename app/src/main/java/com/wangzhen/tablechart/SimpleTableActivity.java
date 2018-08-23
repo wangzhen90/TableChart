@@ -31,6 +31,7 @@ public class SimpleTableActivity extends AppCompatActivity {
         setContentView(R.layout.activity_simple_table);
 
         tableChart = findViewById(R.id.tableView);
+
         tableChart.setOnClickListener(new ITableOnClickListener() {
             @Override
             public void onColumnClick(Column column) {
@@ -77,6 +78,7 @@ public class SimpleTableActivity extends AppCompatActivity {
 
 //        Sheet<Cell> sheet = new Sheet<>(columns, null);
         Sheet<Cell> sheet = new Sheet<>(columns, Utils.measureViewWidth(tableChart),sumCells);
+//        Sheet<Cell> sheet = new Sheet<>(columns,null);
 
 //        sheet.merge(0, 0, 2, 2);
 //        sheet.merge(5, 0, 5, 1);
@@ -121,6 +123,8 @@ public class SimpleTableActivity extends AppCompatActivity {
                 return "#F0F0F0";
             }
         });
+
+
 
 
         tableChart.setHighlightColor(Color.parseColor("#4558C9"));

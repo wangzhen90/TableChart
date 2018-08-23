@@ -12,13 +12,16 @@ import java.util.List;
  */
 
 public class ArraySheet<T extends Cell> extends Sheet<T> {
-
-
-    public ArraySheet(String tableName, List<T> dataList, List columns) {
-        super(columns,dataList);
-
-
+    public ArraySheet(List columns, int viewWidth) {
+        super(columns, viewWidth);
     }
+
+
+//    public ArraySheet(String tableName, List<T> dataList, List columns) {
+//        super(columns,dataList);
+//
+//
+//    }
 
 
 

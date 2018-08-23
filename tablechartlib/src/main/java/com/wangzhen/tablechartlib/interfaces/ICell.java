@@ -23,6 +23,9 @@ public interface ICell {
 
     ICell getRealCell();
 
+    String getFormatValue();
+    void setFormatValue(String value);
+
 //
 //    CellFormat getCellFormat();
 //
