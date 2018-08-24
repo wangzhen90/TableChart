@@ -21,7 +21,8 @@
             android:configChanges="orientation|screenSize" />
         <activity android:name=".FormatterActivity" />
         <activity android:name=".others.MergeActivity" />
-        <activity android:name=".MergedActivity"></activity>
+        <activity android:name=".MergedActivity" />
+        <activity android:name=".FixedColumnActivity"></activity>
     </application>
 
 </manifest>

@@ -11,6 +11,7 @@ import com.wangzhen.tablechartlib.buffer.ColumnBuffer;
 import com.wangzhen.tablechartlib.buffer.SumBuffer;
 import com.wangzhen.tablechartlib.buffer.TitleBuffer;
 import com.wangzhen.tablechartlib.component.TableChart;
+import com.wangzhen.tablechartlib.data.CellType;
 import com.wangzhen.tablechartlib.data.Column;
 import com.wangzhen.tablechartlib.formatter.IBgFormatter;
 import com.wangzhen.tablechartlib.formatter.ITextFormatter;
@@ -107,10 +108,10 @@ public class SimpleRenderer extends DataRenderer {
         }
         if (transformer == null) return;
 
-        float left = 0, top, right, bottom;
+        float left = 0, columnLeft = 0,top, right, bottom;
 
         boolean isCliped = false;
-
+        boolean hasFixedLeft = false;
         ColumnBuffer columnBuffer = mBuffers[index];
         //过滤掉不需要映射column
         if (columnBuffer.size() >= 4) {
@@ -129,12 +130,12 @@ public class SimpleRenderer extends DataRenderer {
 
 
             if (column.isFixed() && checkRect.left < mContentFixedRect.left) {
-                left = mContentFixedRect.left;
+                columnLeft = mContentFixedRect.left;
                 mContentFixedRect.left += checkRect.width();
                 isCliped = true;
 
             } else {
-                left = checkRect.left;
+                columnLeft = checkRect.left;
             }
 
         }
@@ -154,8 +155,19 @@ public class SimpleRenderer extends DataRenderer {
 //        Log.e("2------", "column" + index + "的trans耗费时间：" + (System.currentTimeMillis() - startTimeTrans) + "");
         long startTimeDraw = System.currentTimeMillis();
         ICell realCell;
+        ICell currentCell;
 
         for (int i = 0; i < columnBuffer.size(); i += 4) {
+
+            currentCell = column.getData().get(i / 4);
+            realCell = currentCell.getRealCell();
+
+            if(currentCell.getType() == CellType.EMPTY){
+                left = columnBuffer.buffer[i];
+            }else{
+                left = columnLeft;
+            }
+
             right = columnBuffer.buffer[i + 2];
             top = columnBuffer.buffer[i + 1];
             bottom = columnBuffer.buffer[i + 3];
@@ -175,7 +187,7 @@ public class SimpleRenderer extends DataRenderer {
                 continue;
             }
 
-            realCell = column.getData().get(i / 4).getRealCell();
+
 
 
             c.drawRect(left, top, right, bottom, mGridPaint);
