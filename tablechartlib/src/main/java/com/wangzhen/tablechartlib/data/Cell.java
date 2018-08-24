@@ -17,8 +17,8 @@ public class Cell implements ICell {
     //TODO 添加formatter
     private String formatValue;
 
-    private String fontColor;
-    private String bgColor;
+    private int fontColor = -1;
+    private int bgColor = -1;
 
 
     public Cell(int row, int column, String contents) {
@@ -99,22 +99,22 @@ public class Cell implements ICell {
     }
 
     @Override
-    public String getTextColor() {
+    public int getTextColor() {
         return fontColor;
     }
 
     @Override
-    public void setTextColor(String color) {
+    public void setTextColor(int color) {
         this.fontColor = color;
     }
 
     @Override
-    public String getBgColor() {
+    public int getBgColor() {
         return bgColor;
     }
 
     @Override
-    public void setBgColor(String color) {
+    public void setBgColor(int color) {
         this.bgColor = color;
     }
 }

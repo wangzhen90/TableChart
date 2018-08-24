@@ -11,9 +11,9 @@ import java.util.List;
 
 public interface IBgFormatter {
 
-    String getContentBackgroundColor(ICell cell, Column<ICell> column, List<Column<ICell>> columns);
+    int getContentBackgroundColor(ICell cell, Column<ICell> column, List<Column<ICell>> columns);
 
-    String getTitleBackgroundColor();
+    int getTitleBackgroundColor();
 
 
 

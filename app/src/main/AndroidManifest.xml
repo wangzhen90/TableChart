@@ -16,8 +16,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SimpleTableActivity"
-            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name=".SimpleTableActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity android:name=".FormatterActivity" />
+        <activity android:name=".others.MergeActivity" />
+        <activity android:name=".MergedActivity"></activity>
     </application>
 
 </manifest>

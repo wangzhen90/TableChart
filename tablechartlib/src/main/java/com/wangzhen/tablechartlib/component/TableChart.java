@@ -14,6 +14,7 @@ import com.wangzhen.tablechartlib.data.Column;
 import com.wangzhen.tablechartlib.data.EmptyCell;
 import com.wangzhen.tablechartlib.data.Sheet;
 import com.wangzhen.tablechartlib.formatter.IBgFormatter;
+import com.wangzhen.tablechartlib.formatter.ITextFormatter;
 import com.wangzhen.tablechartlib.formatter.IValueFormatter;
 import com.wangzhen.tablechartlib.highlight.Highlight;
 import com.wangzhen.tablechartlib.interfaces.ICell;
@@ -224,7 +225,7 @@ public class TableChart extends ViewGroup {
         return sheet.getColumnList();
     }
 
-    public List<ICell> getSumCells(){
+    public List<ICell> getSumCells() {
 
         return sheet.getSumCells();
     }
@@ -470,20 +471,24 @@ public class TableChart extends ViewGroup {
     }
 
 
-    public int getRowHeight(){
+    public int getRowHeight() {
 
-        return  sheet.getRowHeight();
+        return sheet.getRowHeight();
 
     }
 
-    public void setRowHeight(int rowHeight){
+    public void setRowHeight(int rowHeight) {
 
         sheet.setRowHeight(rowHeight);
     }
 
-    public IValueFormatter getValueFormatter(){
+    public IValueFormatter getValueFormatter() {
 
         return sheet.getValueFormatter();
+    }
+
+    public ITextFormatter getTextFormatter() {
+        return sheet.getTextFormatter();
     }
 
 }

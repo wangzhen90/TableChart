@@ -67,6 +67,7 @@ public class Sheet<T extends Cell> implements ISheet {
 
         mBgFormatter = new DefaultBgFormatter();
         mTextFormatter = new DefaultTextFormatter();
+        calculate();
 
     }
 
@@ -91,6 +92,7 @@ public class Sheet<T extends Cell> implements ISheet {
 
         mBgFormatter = new DefaultBgFormatter();
         mTextFormatter = new DefaultTextFormatter();
+        calculate();
 
     }
 
@@ -98,11 +100,12 @@ public class Sheet<T extends Cell> implements ISheet {
 
         this.columns = columns;
         this.viewWidth = viewWidth;
-
         this.sumCells = sumCells;
 
         mBgFormatter = new DefaultBgFormatter();
         mTextFormatter = new DefaultTextFormatter();
+
+        calculate();
 
     }
 

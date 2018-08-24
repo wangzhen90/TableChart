@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/darker_gray"
-    tools:context="com.wangzhen.tablechart.SimpleTableActivity">
+    tools:context="com.wangzhen.tablechart.FormatterActivity">
 
     <com.wangzhen.tablechartlib.component.TableChart
         android:id="@+id/tableView"
@@ -13,4 +12,4 @@
         android:layout_height="match_parent"
         android:background="@android:color/white"/>
 
-</android.support.constraint.ConstraintLayout>
+</FrameLayout>

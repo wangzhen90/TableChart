@@ -12,6 +12,9 @@ import com.wangzhen.tablechartlib.buffer.SumBuffer;
 import com.wangzhen.tablechartlib.buffer.TitleBuffer;
 import com.wangzhen.tablechartlib.component.TableChart;
 import com.wangzhen.tablechartlib.data.Column;
+import com.wangzhen.tablechartlib.formatter.IBgFormatter;
+import com.wangzhen.tablechartlib.formatter.ITextFormatter;
+import com.wangzhen.tablechartlib.formatter.IValueFormatter;
 import com.wangzhen.tablechartlib.highlight.Highlight;
 import com.wangzhen.tablechartlib.interfaces.ICell;
 import com.wangzhen.tablechartlib.utils.Transformer;
@@ -34,13 +37,17 @@ public class SimpleRenderer extends DataRenderer {
 
     private ColumnBuffer[] mBuffers;
 
-//    private RectF checkCanDrawBuffer;
+    private IValueFormatter valueFormatter;
+    private IBgFormatter bgFormatter;
+    private ITextFormatter textFormatter;
+
 
     public SimpleRenderer(ViewPortHandler viewPortHandler, TableChart chart) {
         super(viewPortHandler);
         this.mChart = chart;
         mHighlightPaint.setStrokeWidth(mChart.getHighlightBorderWidth());
         mHighlightPaint.setColor(mChart.getHighlightColor());
+
     }
 
     @Override
@@ -49,11 +56,9 @@ public class SimpleRenderer extends DataRenderer {
         List<Column<ICell>> columns = mChart.getColumnList();
         mBuffers = new ColumnBuffer[mChart.getColumnCount()];
         mTitleBuffer = new TitleBuffer(mChart.getColumnCount() * 4, mChart.getColumnCount());
-        mSumBuffer = new SumBuffer(mChart.getColumnCount() * 4,mChart.getHeight());
-//        mTitleBuffer.feed(mChart.getColumnList());
+        mSumBuffer = new SumBuffer(mChart.getColumnCount() * 4, mChart.getHeight());
         for (int i = 0; i < mChart.getColumnCount(); i++) {
             mBuffers[i] = new ColumnBuffer(columns.get(i).getData().size() * 4);
-//            mBuffers[i].feed(columns.get(i));
         }
     }
 
@@ -73,7 +78,7 @@ public class SimpleRenderer extends DataRenderer {
         int clipRestoreCount = c.save();
         c.clipRect(mValuesRect);
         mContentFixedRect.set(mValuesRect);
-        long startTime = System.currentTimeMillis();
+//        long startTime = System.currentTimeMillis();
 
         for (int i = 0; i < mChart.getColumnCount(); i++) {
             drawColumn(c, columns.get(i), i, mValuesRect, columns);
@@ -90,11 +95,8 @@ public class SimpleRenderer extends DataRenderer {
 
     }
 
-//    float left, right;
-
-    //    float[] checkBuffer = new float[]{0,0,0,0};
     RectF checkRect = new RectF();
-    private String bgColorBuffer;
+    private int bgColorBuffer;
     int contentClipCount = 0;
 
 
@@ -138,29 +140,25 @@ public class SimpleRenderer extends DataRenderer {
         }
 
 
-        long startTime = System.currentTimeMillis();
+//        long startTime = System.currentTimeMillis();
 
         if (mChart.hasMergedCell()) {
             columnBuffer.feed(column, columns);
         } else {
             columnBuffer.feed(column);
         }
-        Log.e("2------", "column" + index + "的feed耗费时间：" + (System.currentTimeMillis() - startTime) + "");
+//        Log.e("2------", "column" + index + "的feed耗费时间：" + (System.currentTimeMillis() - startTime) + "");
 
-        long startTimeTrans = System.currentTimeMillis();
+//        long startTimeTrans = System.currentTimeMillis();
         transformer.pointValuesToPixel(columnBuffer.buffer);
-
 //        Log.e("2------", "column" + index + "的trans耗费时间：" + (System.currentTimeMillis() - startTimeTrans) + "");
-
         long startTimeDraw = System.currentTimeMillis();
-
+        ICell realCell;
 
         for (int i = 0; i < columnBuffer.size(); i += 4) {
-
             right = columnBuffer.buffer[i + 2];
             top = columnBuffer.buffer[i + 1];
             bottom = columnBuffer.buffer[i + 3];
-
 
             //过滤掉不需要绘制的Cell
             if (left == right) continue;
@@ -168,7 +166,6 @@ public class SimpleRenderer extends DataRenderer {
             if (isCliped) {
                 right = left + columnBuffer.buffer[i + 2] - columnBuffer.buffer[i];
             }
-
 
             if ((left > mViewPortHandler.contentRight()) || (right < mViewPortHandler.contentLeft())) {
                 return;
@@ -178,19 +175,20 @@ public class SimpleRenderer extends DataRenderer {
                 continue;
             }
 
+            realCell = column.getData().get(i / 4).getRealCell();
+
+
             c.drawRect(left, top, right, bottom, mGridPaint);
-
-            if (mChart.getBgFormatter() != null) {
-                bgColorBuffer = mChart.getBgFormatter().getContentBackgroundColor(column.getData().get(i / 4).getRealCell(), column, columns);
-
-                if (bgColorBuffer != null) {
-                    mBgPaint.setColor(Color.parseColor(bgColorBuffer));
+            if (bgFormatter != null) {
+                bgColorBuffer = bgFormatter.getContentBackgroundColor(realCell, column, columns);
+                if (bgColorBuffer != -1) {
+                    if (bgColorBuffer != mBgPaint.getColor()) mBgPaint.setColor(bgColorBuffer);
                     c.drawRect(left, top, right, bottom, mBgPaint);
                 }
             }
 
 
-            fillValuePaint(column.getData().get(i / 4).getRealCell(), column, columns);
+            fillValuePaint(realCell, column, columns);
 
             Utils.drawSingleText(c, mValuePaint,
                     Utils.getTextCenterX(
@@ -198,11 +196,12 @@ public class SimpleRenderer extends DataRenderer {
                             right - column.getRightOffset() * mChart.getViewPortHandler().getScaleX(),
                             mValuePaint),
                     Utils.getTextCenterY((top + bottom) / 2, mValuePaint),
-                    mChart.getValueFormatter() != null ?
-                            mChart.getValueFormatter().getFormattedValue(column.getData().get(i / 4).getRealCell(), column, columns)
-                            : column.getData().get(i / 4).getRealCell().getContents()
+//                    realCell.getContents()
+                    valueFormatter != null ?
+                            valueFormatter.getFormattedValue(realCell, column, columns)
+                            : realCell.getContents()
             );
-
+            Log.e("2------", "column的第" + i / 4 + "行的draw耗费时间：" + (System.currentTimeMillis() - startTimeDraw) + "");
 
         }
 
@@ -213,46 +212,77 @@ public class SimpleRenderer extends DataRenderer {
         }
 
 //        Log.e("2------", "column" + index + "的draw耗费时间：" + (System.currentTimeMillis() - startTimeDraw) + "");
-
+//        Log.e("3------", "绘制的column" + index);
     }
 
     TextPaint.Align mValueTextAlignBuffer;
 
     private void fillValuePaint(ICell cell, Column<ICell> column, List<Column<ICell>> columns) {
 
-        mValueTextAlignBuffer = mChart.getSheet().getTextFormatter().getTextAlign(cell, column, columns);
+        if (textFormatter == null) return;
 
-        mValuePaint.setTextSize(Utils.convertDpToPixel(mChart.getSheet().getTextFormatter().getTextSize(cell, column, columns) * mViewPortHandler.getScaleX()));
-        mValuePaint.setTextAlign(mValueTextAlignBuffer);
-        mValuePaint.setColor(Color.parseColor(mChart.getSheet().getTextFormatter().getTextColor(cell, column, columns)));
-    }
+        try {
+            mValueTextAlignBuffer = textFormatter.getTextAlign(cell, column, columns);
+
+            float textSize = Utils.convertDpToPixel(textFormatter.getTextSize(cell, column, columns) * mViewPortHandler.getScaleX());
+            int color = textFormatter.getTextColor(cell, column, columns);
+
+            if (mValuePaint.getTextSize() != textSize) {
+                mValuePaint.setTextSize(textSize);
+            }
+
+            if (mValueTextAlignBuffer != mValuePaint.getTextAlign()) {
+                mValuePaint.setTextAlign(mValueTextAlignBuffer);
+            }
+
+            if (mValuePaint.getColor() != color) {
+                mValuePaint.setColor(color);
+            }
 
 
-
-    private void fillTitlePaint(Column column){
-
-        String bgColor = mChart.getBgFormatter().getTitleBackgroundColor();
-        if(mChart.getHighlight() != null && mChart.getHighlight().isTitle() && mChart.getHighlight().getColumnIndex() == column.columnIndex){
-            mBgPaint.setColor(mChart.getHighlightColor());
-            mTitleValuePaint.setColor(Color.parseColor("white"));
-        }else if(!TextUtils.isEmpty(bgColor)){
-            mBgPaint.setColor(Color.parseColor(bgColor));
-            mTitleValuePaint.setColor(mChart.getTitleValueColor());
-        }else{
-            mBgPaint.setColor(Color.TRANSPARENT);
-            mTitleValuePaint.setColor(mChart.getTitleValueColor());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
 
-    private void fillSumPaint(){
-        String bgColor = mChart.getBgFormatter().getTitleBackgroundColor();
-        if(!TextUtils.isEmpty(bgColor)){
-            mBgPaint.setColor(Color.parseColor(bgColor));
+    private void fillTitlePaint(Column column) {
+
+        int bgColor = bgFormatter.getTitleBackgroundColor();
+
+
+        if (mChart.getHighlight() != null && mChart.getHighlight().isTitle() && mChart.getHighlight().getColumnIndex() == column.columnIndex) {
+
+            mBgPaint.setColor(mChart.getHighlightColor());
+            mTitleValuePaint.setColor(Color.parseColor("white"));
+
+        } else if (bgColor != -1) {
+            mBgPaint.setColor(bgColor);
             mTitleValuePaint.setColor(mChart.getTitleValueColor());
-        }else{
+        } else {
             mBgPaint.setColor(Color.TRANSPARENT);
             mTitleValuePaint.setColor(mChart.getTitleValueColor());
+        }
+
+        if(mTitleValuePaint.getTextAlign() != column.getTitleTextAlign()){
+            mTitleValuePaint.setTextAlign(column.getTitleTextAlign());
+        }
+
+    }
+
+
+    private void fillSumPaint(Column column) {
+        int bgColor = bgFormatter.getTitleBackgroundColor();
+        if (bgColor != -1) {
+            mBgPaint.setColor(bgColor);
+            mSumValuePaint.setColor(mChart.getTitleValueColor());
+        } else {
+            mBgPaint.setColor(Color.TRANSPARENT);
+            mSumValuePaint.setColor(mChart.getTitleValueColor());
+        }
+
+        if(mSumValuePaint.getTextAlign() != column.getTitleTextAlign()){
+            mSumValuePaint.setTextAlign(column.getTitleTextAlign());
         }
     }
 
@@ -266,16 +296,16 @@ public class SimpleRenderer extends DataRenderer {
     public void drawTitle(Canvas c) {
         transformer = mChart.getTransformer();
         if (transformer == null) return;
-        //优化onDraw执行时间，只在initBuffer中做一次feed
         mTitleBuffer.feed(mChart.getColumnList());
 
         transformer.pointValuesToPixel(mTitleBuffer.buffer);
 
-        if(mChart.isShowSum()){
+        if (mChart.isShowSum()) {
             mSumBuffer.feed(mChart.getColumnList());
             transformer.pointValuesToPixel(mSumBuffer.buffer);
         }
 
+        if (mChart.getSheet() != null) getFormatter();
 
 
         Column column;
@@ -306,7 +336,7 @@ public class SimpleRenderer extends DataRenderer {
             if (column != null && column.isFixed()) {
 
 
-                if(mFixedRect.bottom == mViewPortHandler.contentBottom()){
+                if (mFixedRect.bottom == mViewPortHandler.contentBottom()) {
                     mFixedRect.bottom += column.getRowHeight();
                 }
 
@@ -317,13 +347,6 @@ public class SimpleRenderer extends DataRenderer {
                     clipCount++;
                     isCliped = true;
                 }
-//                else if(right > mFixedRect.right){//只支持左侧固定
-//                    right = mFixedRect.right;
-//                    left = right - (mTitleBuffer.buffer[i + 2] - mTitleBuffer.buffer[i]);
-//                    mFixedRect.right -= right - left;
-//
-//                    clipCount++;
-//                }
 
             }
 
@@ -334,34 +357,38 @@ public class SimpleRenderer extends DataRenderer {
 
             c.drawRect(left, top, right, bottom, mBgPaint);
             c.drawRect(left, top, right, bottom, mGridPaint);
+
             mTitleValuePaint.setTextSize(Utils.convertDpToPixel(mChart.getTitleFontSize() * mViewPortHandler.getScaleX()));
+
             Utils.drawSingleText(c, mTitleValuePaint,
-                    Utils.getTextCenterX(left, right, mValuePaint),
-                    Utils.getTextCenterY((top + bottom) / 2, mValuePaint),
+                    Utils.getTextCenterX(left + column.getLeftOffset() * mChart.getViewPortHandler().getScaleX(),
+                            right - column.getRightOffset() * mChart.getViewPortHandler().getScaleX(), mTitleValuePaint),
+                    Utils.getTextCenterY((top + bottom) / 2, mTitleValuePaint),
                     mTitleBuffer.columnNames[i / 4]);
 
-            if(mChart.isShowSum()){
+            if (mChart.isShowSum()) {
 
-                float sumTop,sumBottom,sumHeight;
-                sumHeight = mSumBuffer.buffer[i+3] - mSumBuffer.buffer[i+1];
-                sumBottom = mSumBuffer.buffer[i+3];
+                float sumTop, sumBottom, sumHeight;
+                sumHeight = mSumBuffer.buffer[i + 3] - mSumBuffer.buffer[i + 1];
+                sumBottom = mSumBuffer.buffer[i + 3];
 
 
-                if(sumBottom != mChart.getHeight()){
+                if (sumBottom != mChart.getHeight()) {
                     sumBottom = mChart.getHeight();
                 }
                 sumTop = sumBottom - sumHeight;
 
 
-                fillSumPaint();
+                fillSumPaint(column);
                 c.drawRect(left, sumTop, right, sumBottom, mBgPaint);
                 c.drawRect(left, sumTop, right, sumBottom, mGridPaint);
 
                 mSumValuePaint.setTextSize(Utils.convertDpToPixel(mChart.getTitleFontSize() * mViewPortHandler.getScaleY()));
 
                 Utils.drawSingleText(c, mSumValuePaint,
-                        Utils.getTextCenterX(left, right, mValuePaint),
-                        Utils.getTextCenterY((sumTop + sumBottom) / 2, mValuePaint),
+                        Utils.getTextCenterX(left + column.getLeftOffset() * mChart.getViewPortHandler().getScaleX(),
+                                right - column.getRightOffset() * mChart.getViewPortHandler().getScaleX(), mSumValuePaint),
+                        Utils.getTextCenterY((sumTop + sumBottom) / 2, mSumValuePaint),
                         column.getSumCell() != null ? column.getSumCell().getContents() : null);
             }
 
@@ -383,59 +410,10 @@ public class SimpleRenderer extends DataRenderer {
 
     @Override
     public void drawSum(Canvas c) {
-//        if(mChart.isShowSum()){
-//            mSumBuffer.feed(mChart.getColumnList());
-//
-//            transformer = mChart.getTransformer();
-//            if (transformer == null) return;
-//            mSumBuffer.feed(mChart.getColumnList());
-//            ICell sumCell;
-//            Column<ICell> column;
-//            for(int i = 0; i < mSumBuffer.buffer.length; i+=4){
-//
-//                float left = mTitleBuffer.buffer[i];
-//                float top = mTitleBuffer.buffer[i + 1];
-//                float right = mTitleBuffer.buffer[i + 2];
-//                float bottom = mTitleBuffer.buffer[i + 3];
-//                float height = bottom - top;
-//                boolean isCliped = false;
-//
-//                column = mChart.getColumnList().get(i / 4);
-//
-//                if (column != null && column.isFixed()) {
-//
-//                    if (left < mFixedRect.left) {
-//                        left = mFixedRect.left;
-//                        right = left + mTitleBuffer.buffer[i + 2] - mTitleBuffer.buffer[i];
-//                        mFixedRect.left += right - left;
-//                        clipCount++;
-//                        isCliped = true;
-//                    }
-////                else if(right > mFixedRect.right){//只支持左侧固定
-////                    right = mFixedRect.right;
-////                    left = right - (mTitleBuffer.buffer[i + 2] - mTitleBuffer.buffer[i]);
-////                    mFixedRect.right -= right - left;
-////
-////                    clipCount++;
-////                }
-//
-//                }
-//
-//                if(mSumBuffer.buffer[i] > mViewPortHandler.contentRight()){
-//                    continue;
-//                }
-//
-//
-//
-//            }
-//
-//
-//        }
     }
 
     @Override
     public void drawExtras(Canvas c) {
-
 
 
     }
@@ -479,6 +457,12 @@ public class SimpleRenderer extends DataRenderer {
     }
 
 
+    void getFormatter() {
 
+        if (valueFormatter == null) valueFormatter = mChart.getValueFormatter();
+        if (bgFormatter == null) bgFormatter = mChart.getBgFormatter();
+        if (textFormatter == null) textFormatter = mChart.getTextFormatter();
+
+    }
 
 }

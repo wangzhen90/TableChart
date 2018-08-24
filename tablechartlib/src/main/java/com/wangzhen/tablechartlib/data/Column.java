@@ -1,10 +1,12 @@
 package com.wangzhen.tablechartlib.data;
 
 import android.graphics.Paint;
+import android.text.TextUtils;
 
 import com.wangzhen.tablechartlib.interfaces.ICell;
 import com.wangzhen.tablechartlib.utils.Utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,7 +27,7 @@ public class Column<T extends ICell> {
 
     public int minWidth = 50;
 
-    private List<T> datas;
+    private List<T> datas = new ArrayList<>();
 
     /**
      * 子列
@@ -54,6 +56,8 @@ public class Column<T extends ICell> {
     private int rightOffset;
 
     private ICell sumCell;
+
+    private Paint.Align titleTextAlign = Paint.Align.LEFT;
 
 
     public Column() {
@@ -86,12 +90,13 @@ public class Column<T extends ICell> {
     }
 
     public List<T> getData() {
-
         return datas;
     }
 
 
     public int computeWidth() {
+
+        if(!TextUtils.isEmpty(longestString)) return columnWidth;
 
         columnWidth = Utils.calcTextWidth(Utils.paint,columnName);
 
@@ -100,7 +105,7 @@ public class Column<T extends ICell> {
         if(datas != null){
             String cellContent;
             for(int i = 0; i < datas.size(); i++){
-                cellContent = datas.get(i).getContents();
+                cellContent = datas.get(i).getFormatValue() != null ? datas.get(i).getFormatValue() : datas.get(i).getContents();
                 if(cellContent.length() > longestString.length()){
                     longestString = cellContent;
                     cellWidth = Utils.calcTextWidth(Utils.paint,longestString);
@@ -195,5 +200,13 @@ public class Column<T extends ICell> {
 
     public void setSumCell(ICell sumCell) {
         this.sumCell = sumCell;
+    }
+
+    public Paint.Align getTitleTextAlign() {
+        return titleTextAlign;
+    }
+
+    public void setTitleTextAlign(Paint.Align titleTextAlign) {
+        this.titleTextAlign = titleTextAlign;
     }
 }

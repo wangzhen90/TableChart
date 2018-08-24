@@ -1,7 +1,5 @@
 package com.wangzhen.tablechartlib.utils;
 
-import android.text.TextUtils;
-
 import com.wangzhen.tablechartlib.data.Column;
 import com.wangzhen.tablechartlib.formatter.BiColorFormatSet;
 import com.wangzhen.tablechartlib.interfaces.ICell;
@@ -27,10 +25,10 @@ public class MultiColorFormatUtils {
     public static final int COLOR_BG = 1;
 
     List<BiColorFormatSet> colorSets;
-    String defaultTextColor;
-    String defaultBgColor;
+    int defaultTextColor;
+    int defaultBgColor;
 
-    public MultiColorFormatUtils(List<BiColorFormatSet> colorSets,String defaultTextColor,String defaultBgColor){
+    public MultiColorFormatUtils(List<BiColorFormatSet> colorSets, int defaultTextColor, int defaultBgColor) {
 
         this.colorSets = colorSets;
         this.defaultBgColor = defaultBgColor;
@@ -38,66 +36,65 @@ public class MultiColorFormatUtils {
 
     }
 
+    //TODO 此处使用-1可能会有误差...但可以忽略不计
+    public int getTextColor(ICell entry, Column<ICell> column) {
 
-    public String getTextColor(ICell entry, Column<ICell> column){
-
-        if(entry.getTextColor() != null) return entry.getTextColor();
+        if (entry.getTextColor() != -1) return entry.getTextColor();
 
         float value;
         try {
             value = Float.parseFloat(entry.getContents());
-            if( Float.isNaN(value)){
+            if (Float.isNaN(value)) {
                 return defaultTextColor;
             }
 
             BiColorFormatSet colorSet;
-            String resultColor;
-            for(int i = colorSets.size() - 1; i >= 0; i--){
+            int resultColor;
+            for (int i = colorSets.size() - 1; i >= 0; i--) {
                 colorSet = colorSets.get(i);
-                if(TextUtils.isEmpty(colorSet.fontColor)) continue;
-                resultColor = getColor(colorSet,value,COLOR_TEXT);
-                if(resultColor != null){
+                if (colorSet.fontColor == -1) continue;
+                resultColor = getColor(colorSet, value, COLOR_TEXT);
+                if (resultColor != -1) {
                     return resultColor;
                 }
             }
 
+            entry.setTextColor(defaultTextColor);
             return defaultTextColor;
-
-
         } catch (NumberFormatException e) {
             e.printStackTrace();
+            entry.setTextColor(defaultTextColor);
             return defaultTextColor;
         }
 
     }
 
 
-    public String getTextBgColor(ICell entry, Column<ICell> column){
-        if(entry.getBgColor() != null) return entry.getBgColor();
+    public int getTextBgColor(ICell entry, Column<ICell> column) {
+        if (entry.getBgColor() != -1) return entry.getBgColor();
 
         float value;
         try {
             value = Float.parseFloat(entry.getContents());
-            if( Float.isNaN(value)){
+            if (Float.isNaN(value)) {
                 return defaultBgColor;
             }
 
             BiColorFormatSet colorSet;
-            String resultColor;
-            for(int i = colorSets.size() - 1; i >= 0; i--){
+            int resultColor;
+            for (int i = colorSets.size() - 1; i >= 0; i--) {
                 colorSet = colorSets.get(i);
-                if(TextUtils.isEmpty(colorSet.bgColor)) continue;
-                resultColor = getColor(colorSet,value,COLOR_BG);
-                if(resultColor != null){
+                if (colorSet.bgColor == -1) continue;
+                resultColor = getColor(colorSet, value, COLOR_BG);
+                if (resultColor != -1) {
                     return resultColor;
                 }
             }
 
             return defaultBgColor;
-
-
         } catch (NumberFormatException e) {
             e.printStackTrace();
+            entry.setBgColor(defaultBgColor);
             return defaultBgColor;
         }
 
@@ -105,53 +102,56 @@ public class MultiColorFormatUtils {
     }
 
 
-    private String getColor(BiColorFormatSet colorSet,float value,int type){
+    private int getColor(BiColorFormatSet colorSet, float value, int type) {
 
-        switch (colorSet.oprate){
+        switch (colorSet.oprate) {
 
             case OPERATOR_EQUAL:
 
-                if(value == colorSet.belowNum) return type == 0 ? colorSet.fontColor : colorSet.bgColor;
+                if (value == colorSet.belowNum)
+                    return type == 0 ? colorSet.fontColor : colorSet.bgColor;
 
                 break;
 
             case OPERATOR_GREAER_THAN:
 
-                if(value > colorSet.belowNum) return type == 0 ? colorSet.fontColor : colorSet.bgColor;
+                if (value > colorSet.belowNum)
+                    return type == 0 ? colorSet.fontColor : colorSet.bgColor;
 
                 break;
 
             case OPERATOR_GREAER_THAN_OR_EQUAL:
 
-                if(value >= colorSet.belowNum) return type == 0 ? colorSet.fontColor : colorSet.bgColor;
+                if (value >= colorSet.belowNum)
+                    return type == 0 ? colorSet.fontColor : colorSet.bgColor;
 
                 break;
 
             case OPERATOR_LESS_THAN:
 
-                if(value < colorSet.belowNum) return type == 0 ? colorSet.fontColor : colorSet.bgColor;
+                if (value < colorSet.belowNum)
+                    return type == 0 ? colorSet.fontColor : colorSet.bgColor;
 
                 break;
 
             case OPERATOR_LESS_THAN_OR_EQUAL:
 
-                if(value <= colorSet.belowNum) return type == 0 ? colorSet.fontColor : colorSet.bgColor;
+                if (value <= colorSet.belowNum)
+                    return type == 0 ? colorSet.fontColor : colorSet.bgColor;
 
                 break;
 
             case OPERATOR_RANGE:
 
-                if(value >= colorSet.belowNum && value <= colorSet.aboveNum) return type == 0 ? colorSet.fontColor : colorSet.bgColor;
+                if (value >= colorSet.belowNum && value <= colorSet.aboveNum)
+                    return type == 0 ? colorSet.fontColor : colorSet.bgColor;
 
                 break;
         }
 
-        return null;
+        return -1;
 
     }
-
-
-
 
 
 }

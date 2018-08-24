@@ -34,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
 
 
         items.add(new ChartItem("简单表格（测试大量数据）",SimpleTableActivity.class));
+        items.add(new ChartItem("测试格式化",FormatterActivity.class));
+        items.add(new ChartItem("测试合并单元格",MergedActivity.class));
 
     }
 

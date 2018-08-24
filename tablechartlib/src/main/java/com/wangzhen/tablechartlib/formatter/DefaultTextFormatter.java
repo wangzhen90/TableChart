@@ -1,5 +1,6 @@
 package com.wangzhen.tablechartlib.formatter;
 
+import android.graphics.Color;
 import android.text.TextPaint;
 
 import com.wangzhen.tablechartlib.data.Column;
@@ -23,7 +24,7 @@ public class DefaultTextFormatter implements ITextFormatter {
     }
 
     @Override
-    public String getTextColor(ICell cell, Column<ICell> column, List<Column<ICell>> columns) {
-        return null;
+    public int getTextColor(ICell cell, Column<ICell> column, List<Column<ICell>> columns) {
+        return Color.parseColor("#4D4D4D");
     }
 }

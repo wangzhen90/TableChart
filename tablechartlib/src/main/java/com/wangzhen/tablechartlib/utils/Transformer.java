@@ -137,7 +137,7 @@ public class Transformer {
         mMatrixValueToPx.mapPoints(pts);
         mViewPortHandler.getMatrixTouch().mapPoints(pts);
         mMatrixOffset.mapPoints(pts);
-        Log.e("mapPoints","count: "+ pts.length+",mapPoints time:" +(System.currentTimeMillis() - s));
+//        Log.e("mapPoints","count: "+ pts.length+",mapPoints time:" +(System.currentTimeMillis() - s));
     }
 
     /**

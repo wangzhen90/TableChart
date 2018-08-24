@@ -9,7 +9,7 @@ public class BiColorFormatSet {
     public BiColorFormatSet(){
 
     }
-    public BiColorFormatSet(String oprate,String fontColor,String bgColor,float belowNum,float aboveNum){
+    public BiColorFormatSet(String oprate,int fontColor,int bgColor,float belowNum,float aboveNum){
 
         this.oprate = oprate;
         this.fontColor = fontColor;
@@ -22,9 +22,9 @@ public class BiColorFormatSet {
 
     public String oprate;
 
-    public String fontColor;
+    public int fontColor = -1;
 
-    public String bgColor;
+    public int bgColor = -1;
     //区间下限
     public float belowNum;
     //区间上限

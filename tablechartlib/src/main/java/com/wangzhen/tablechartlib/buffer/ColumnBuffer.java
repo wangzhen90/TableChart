@@ -68,7 +68,7 @@ public class ColumnBuffer extends AbstractBuffer<Column<ICell>> {
 
             if (cell.getType() == CellType.EMPTY) {
                 //这种处理方式会导致同一区域重绘多次，需要优化
-                cell = ((EmptyCell)cell).getRealCell();
+                cell = cell.getRealCell();
                 realColumn = columns.get(cell.getColumn());
                 left = realColumn.getPreColumnsWidth();
                 top = cell.getRow() * realColumn.getRowHeight() + realColumn.titleHeight;

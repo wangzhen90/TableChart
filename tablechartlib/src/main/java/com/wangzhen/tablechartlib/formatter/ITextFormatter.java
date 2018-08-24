@@ -18,6 +18,6 @@ public interface ITextFormatter {
 
     TextPaint.Align getTextAlign(ICell cell, Column<ICell> column, List<Column<ICell>> columns);
 
-    String getTextColor(ICell cell, Column<ICell> column, List<Column<ICell>> columns);
+    int getTextColor(ICell cell, Column<ICell> column, List<Column<ICell>> columns);
 
 }

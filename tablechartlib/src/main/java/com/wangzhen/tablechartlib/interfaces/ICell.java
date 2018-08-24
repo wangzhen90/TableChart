@@ -28,13 +28,13 @@ public interface ICell {
 
     void setFormatValue(String value);
 
-    String getTextColor();
+    int getTextColor();
 
-    void setTextColor(String color);
+    void setTextColor(int color);
 
-    String getBgColor();
+    int getBgColor();
 
-    void setBgColor(String color);
+    void setBgColor(int color);
 
 
 //

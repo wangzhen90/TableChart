@@ -79,22 +79,22 @@ public class EmptyCell implements ICell {
     }
 
     @Override
-    public String getTextColor() {
-        return null;
+    public int getTextColor() {
+        return -1;
     }
 
     @Override
-    public void setTextColor(String color) {
+    public void setTextColor(int color) {
 
     }
 
     @Override
-    public String getBgColor() {
-        return null;
+    public int getBgColor() {
+        return -1;
     }
 
     @Override
-    public void setBgColor(String color) {
+    public void setBgColor(int color) {
 
     }
 }

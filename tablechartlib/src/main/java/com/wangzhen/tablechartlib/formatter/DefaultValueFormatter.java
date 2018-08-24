@@ -68,6 +68,6 @@ public class DefaultValueFormatter implements IValueFormatter
 
     @Override
     public String getFormattedValue(ICell cell, Column<ICell> column, List<Column<ICell>> columns) {
-        return null;
+        return cell.getContents();
     }
 }
