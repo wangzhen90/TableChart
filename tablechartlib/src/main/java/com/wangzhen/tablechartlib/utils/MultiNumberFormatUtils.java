@@ -1,6 +1,8 @@
 package com.wangzhen.tablechartlib.utils;
 
 
+import android.util.Log;
+
 import com.wangzhen.tablechartlib.data.Column;
 import com.wangzhen.tablechartlib.formatter.BiFormatResult;
 import com.wangzhen.tablechartlib.formatter.BiFormatSet;
@@ -8,6 +10,7 @@ import com.wangzhen.tablechartlib.interfaces.ICell;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
+import java.util.regex.Pattern;
 
 /**
  * Created by wangzhen on 2018/7/17.
@@ -83,13 +86,17 @@ public class MultiNumberFormatUtils {
                 return entry.getContents();
             }
         } catch (NumberFormatException e) {
+            entry.setFormatValue(entry.getContents());
             e.printStackTrace();
             return entry.getContents();
         }
 
+        entry.setFormatValue(format(value,entry));
 
-        return format(value,entry);
+        return entry.getFormatValue();
     }
+
+
 
     public String format(float value,ICell entry){
 
@@ -169,19 +176,19 @@ public class MultiNumberFormatUtils {
         Unit[] unitMap = getUnitMap(formatSet.language);
         for (int i = 0; i < unitMap.length; i++) {
 
-             if(result.number <= unitMap[i].num && i == 0){
-                 result.unit = "";
-                 break;
-             }else if(result.number <= unitMap[i].num && i > 0){
-                 result.number = result.number / unitMap[i-1].num;
-                 result.unit = unitMap[i-1].unit;
-                 break;
+            if(result.number <= unitMap[i].num && i == 0){
+                result.unit = "";
+                break;
+            }else if(result.number <= unitMap[i].num && i > 0){
+                result.number = result.number / unitMap[i-1].num;
+                result.unit = unitMap[i-1].unit;
+                break;
 
-             }else if(i == unitMap.length - 1){
-                 result.number = result.number / unitMap[i].num;
-                 result.unit = unitMap[i].unit;
-                 break;
-             }
+            }else if(i == unitMap.length - 1){
+                result.number = result.number / unitMap[i].num;
+                result.unit = unitMap[i].unit;
+                break;
+            }
         }
     }
 
@@ -210,9 +217,25 @@ public class MultiNumberFormatUtils {
         return language.equals("zh") ? ZH_Unit : EN_Unit;
     }
 
+    public static boolean isInteger(String str) {
+
+        Pattern pattern = Pattern.compile("^-?\\d+(\\.\\d+)?$");
+        return pattern.matcher(str).matches();
+    }
+
+    public static void main(String[] params){
+
+        System.out.println("11111:"+isInteger("111"));
+        System.out.println("111.1111:"+isInteger("111.1111"));
+        System.out.println("-111.1111:"+isInteger("-111.1111"));
+        System.out.println("-111:"+isInteger("-111"));
+        System.out.println("q111.11:"+isInteger("q111.11"));
+        System.out.println("111.11q:"+isInteger("111.11q"));
+        System.out.println("qqq:"+isInteger("qqq"));
+    }
 
 
-    private void test(){
+    private void testFormatter(){
         double pi = 3.1415927;//圆周率
         //取一位整数
         System.out.println(new DecimalFormat("0").format(pi));//3

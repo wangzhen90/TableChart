@@ -188,8 +188,6 @@ public class SimpleRenderer extends DataRenderer {
             }
 
 
-
-
             c.drawRect(left, top, right, bottom, mGridPaint);
             if (bgFormatter != null) {
                 bgColorBuffer = bgFormatter.getContentBackgroundColor(realCell, column, columns);
@@ -213,7 +211,8 @@ public class SimpleRenderer extends DataRenderer {
                             valueFormatter.getFormattedValue(realCell, column, columns)
                             : realCell.getContents()
             );
-            Log.e("2------", "column的第" + i / 4 + "行的draw耗费时间：" + (System.currentTimeMillis() - startTimeDraw) + "");
+            if(column.columnIndex == 3)
+            Log.e("2------", column.columnIndex +"_column的第" + i / 4 + "行的draw耗费时间：" + (System.currentTimeMillis() - startTimeDraw) + "");
 
         }
 

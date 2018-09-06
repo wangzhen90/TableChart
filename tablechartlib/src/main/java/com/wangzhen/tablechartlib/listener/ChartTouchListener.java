@@ -450,13 +450,12 @@ public class ChartTouchListener extends GestureDetector.SimpleOnGestureListener 
 
 
 
-        if(e.getY() >= mChart.getHeight() - mChart.getRowHeight() * mChart.getViewPortHandler().getScaleY()){
+        if(e.getY() >= mChart.getHeight() - (mChart.isShowSum() ? mChart.getRowHeight() * mChart.getViewPortHandler().getScaleY() : 0)){
             return true;
         }
 
         Log.e("18========","event.x" + e.getX() + ",event.y:"+e.getY());
         Transformer transformer = mChart.getTransformer();
-
 
         MPPointD values = transformer.getValuesByTouchPoint(e.getX(),e.getY());
 

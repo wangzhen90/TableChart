@@ -5,6 +5,7 @@ import com.wangzhen.tablechartlib.formatter.BiColorFormatSet;
 import com.wangzhen.tablechartlib.interfaces.ICell;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Created by wangzhen on 2018/8/23.
@@ -19,6 +20,8 @@ public class MultiColorFormatUtils {
     public static final String OPERATOR_GREAER_THAN_OR_EQUAL = "greaterThanOrEqual";
     public static final String OPERATOR_LESS_THAN_OR_EQUAL = "lessThanOrEqual";
     public static final String OPERATOR_RANGE = "range";
+
+    static Pattern numberPattern = Pattern.compile("^-?\\d+(\\.\\d+)?$");
 
 
     public static final int COLOR_TEXT = 0;
@@ -43,8 +46,15 @@ public class MultiColorFormatUtils {
 
         float value;
         try {
+
+            if (!isNumber(entry.getContents())) {
+                entry.setTextColor(defaultTextColor);
+                return defaultTextColor;
+            }
+
             value = Float.parseFloat(entry.getContents());
             if (Float.isNaN(value)) {
+                entry.setTextColor(defaultTextColor);
                 return defaultTextColor;
             }
 
@@ -55,6 +65,7 @@ public class MultiColorFormatUtils {
                 if (colorSet.fontColor == -1) continue;
                 resultColor = getColor(colorSet, value, COLOR_TEXT);
                 if (resultColor != -1) {
+                    entry.setTextColor(resultColor);
                     return resultColor;
                 }
             }
@@ -75,8 +86,15 @@ public class MultiColorFormatUtils {
 
         float value;
         try {
+
+            if (!isNumber(entry.getContents())) {
+                entry.setTextColor(defaultBgColor);
+                return defaultBgColor;
+            }
+
             value = Float.parseFloat(entry.getContents());
             if (Float.isNaN(value)) {
+                entry.setBgColor(defaultBgColor);
                 return defaultBgColor;
             }
 
@@ -87,6 +105,7 @@ public class MultiColorFormatUtils {
                 if (colorSet.bgColor == -1) continue;
                 resultColor = getColor(colorSet, value, COLOR_BG);
                 if (resultColor != -1) {
+                    entry.setBgColor(resultColor);
                     return resultColor;
                 }
             }
@@ -151,6 +170,11 @@ public class MultiColorFormatUtils {
 
         return -1;
 
+    }
+
+    public static boolean isNumber(String str) {
+
+        return numberPattern.matcher(str).matches();
     }
 
 
