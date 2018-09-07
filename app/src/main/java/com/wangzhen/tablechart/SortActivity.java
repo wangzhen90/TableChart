@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 public class SortActivity extends AppCompatActivity {
 
@@ -54,7 +55,13 @@ public class SortActivity extends AppCompatActivity {
 
         final List<Column> columns = new ArrayList<>();
 
-        for (int i = 0; i < 20; i++) {
+        int columnCounts = 20;
+        int rowCounts = 300;
+
+        String[][] rawDataArray = new String [columnCounts][rowCounts];
+
+
+        for (int i = 0; i < columnCounts; i++) {
             Column column = new Column(i == 1 ? "标题比较长比较长比较长" + i : "标题" + i);
             column.setTitleTextAlign(Paint.Align.CENTER);
 
@@ -69,11 +76,33 @@ public class SortActivity extends AppCompatActivity {
             sumCells.add(new Cell(-1, i, "客户" + i));
         }
 
+        Random random = new Random();
+
         for (int i = 0; i < columns.size(); i++) {
             List<Cell> cells = new ArrayList<>();
-            for (int j = 0; j < 300; j++) {
-                Cell cell = new Cell(j, i, "客户" + i + "-" + j);
-                cells.add(cell);
+            for (int j = 0; j < rowCounts; j++) {
+
+                String cellString;
+
+                if(i == 0){
+                    if(i % 2 == 0){
+//                        cellString = "aa" + i + "-" + j;
+                        cellString = "aa"  + "-" + j;
+                    }else{
+//                        cellString = "mm" + i + "-" + j;
+                        cellString = "mm"  + "-" + j;
+                    }
+                }else if(i == 2){
+//                    cellString = random.nextInt(10000000)+"";
+                    cellString = j+"";
+                }else{
+//                    cellString = "客户" + i + "-" + j;
+                    cellString = "客户" + "-" + j;
+                }
+
+
+                cells.add(new Cell(j,i,cellString));
+
             }
 
             columns.get(i).setData(cells);
@@ -84,8 +113,11 @@ public class SortActivity extends AppCompatActivity {
 
         tableChart.setHighlightColor(Color.parseColor("#4558C9"));
         tableChart.setShowSum(true);
+        tableChart.setSortable(true);
 
         tableChart.setSheet(sheet);
+
+
 
 //        Arrays.sort();
 //
@@ -101,10 +133,6 @@ public class SortActivity extends AppCompatActivity {
         //可以弄一个ListBuffer，List清空之后不销毁
 
         //需要维护一个AsyncTask，然后排序的时候loading
-
-
-
-
 
     }
 

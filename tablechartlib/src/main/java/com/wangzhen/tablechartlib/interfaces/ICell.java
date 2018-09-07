@@ -6,8 +6,10 @@ import com.wangzhen.tablechartlib.data.CellType;
  * Created by wangzhen on 2018/6/11.
  */
 
-public interface ICell {
+public interface ICell  {
     int getRow();
+
+    int getRawRow();
 
     int getColumn();
 
@@ -36,7 +38,7 @@ public interface ICell {
 
     void setBgColor(int color);
 
-
+    void setRow(int index);
 //
 //    CellFormat getCellFormat();
 //

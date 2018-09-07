@@ -93,5 +93,9 @@ public abstract class AbstractBuffer<T>  {
 
     }
 
+    public  void feed(T data, boolean sorted){
+
+    }
+
 
 }

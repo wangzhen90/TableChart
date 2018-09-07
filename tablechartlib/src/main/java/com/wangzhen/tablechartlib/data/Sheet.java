@@ -38,8 +38,8 @@ public class Sheet<T extends Cell> implements ISheet {
 
     private int rowHeight = 70;
 
-    private int columnLeftOffset = (int) Utils.convertDpToPixel(8);
-    private int columnRightOffset = (int) Utils.convertDpToPixel(8);
+    public int columnLeftOffset = (int) Utils.convertDpToPixel(20);
+    public int columnRightOffset = (int) Utils.convertDpToPixel(20);
 
 
     private ArrayList<ICellRange> mergedCells = new ArrayList();
@@ -56,6 +56,8 @@ public class Sheet<T extends Cell> implements ISheet {
     private IValueFormatter mValueFormatter;//不设置默认值
 
     private int viewWidth;
+
+    public TableChart mChart;
 
 
     public Sheet(List columns, int viewWidth) {
@@ -336,9 +338,10 @@ public class Sheet<T extends Cell> implements ISheet {
 
         ICell cell;
 
-        if (column != null && !column.getData().isEmpty()) {
+        List<T> cells = mChart.isSorted() ? column.getSortDatas() : column.getData();
 
-            List<T> cells = column.getData();
+        if (column != null && !cells.isEmpty()) {
+
 
             int low = 0;
             int high = cells.size();
@@ -433,6 +436,16 @@ public class Sheet<T extends Cell> implements ISheet {
 
     public List<ICell> getSumCells(){
         return sumCells;
+    }
+
+    @Override
+    public void setChart(TableChart chart) {
+        mChart = chart;
+    }
+
+    @Override
+    public TableChart getChart() {
+        return mChart;
     }
 
     public IValueFormatter getValueFormatter() {

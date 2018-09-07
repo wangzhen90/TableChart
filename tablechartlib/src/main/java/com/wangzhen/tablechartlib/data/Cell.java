@@ -13,6 +13,8 @@ public class Cell implements ICell {
     private int lastRow;
     private int lastColumn;
 
+    private int rawRow;
+
     private String contents;
     //TODO 添加formatter
     private String formatValue;
@@ -28,6 +30,8 @@ public class Cell implements ICell {
 
         lastColumn = column;
         lastRow = row;
+
+        rawRow = row;//初始化后不再改变，用于排序
     }
 
     public Cell(int row, int column, int lastRow, int lastColumn, String contents) {
@@ -37,12 +41,20 @@ public class Cell implements ICell {
 
         this.lastColumn = lastColumn;
         this.lastRow = lastRow;
+
+        rawRow = row;//初始化后不再改变，用于排序
+
     }
 
 
     @Override
     public int getRow() {
         return row;
+    }
+
+    @Override
+    public int getRawRow() {
+        return rawRow;
     }
 
     @Override
@@ -116,5 +128,12 @@ public class Cell implements ICell {
     @Override
     public void setBgColor(int color) {
         this.bgColor = color;
+    }
+
+    @Override
+    public void setRow(int index) {
+        row = index;
+        lastRow = row;
+
     }
 }

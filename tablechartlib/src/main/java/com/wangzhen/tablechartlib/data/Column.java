@@ -3,6 +3,7 @@ package com.wangzhen.tablechartlib.data;
 import android.graphics.Paint;
 import android.text.TextUtils;
 
+import com.wangzhen.tablechartlib.component.TableChart;
 import com.wangzhen.tablechartlib.interfaces.ICell;
 import com.wangzhen.tablechartlib.utils.Utils;
 
@@ -28,6 +29,7 @@ public class Column<T extends ICell> {
     public int minWidth = 50;
 
     private List<T> datas = new ArrayList<>();
+    private List<T> sortDatas = new ArrayList<>();
 
     /**
      * 子列
@@ -59,12 +61,12 @@ public class Column<T extends ICell> {
 
     private Paint.Align titleTextAlign = Paint.Align.LEFT;
 
+    private int sortMode = TableChart.SORT_DISORDER;
+
 
     public Column() {
 
     }
-
-
 
     public Column(String columnName) {
         this.columnName = columnName;
@@ -77,6 +79,7 @@ public class Column<T extends ICell> {
 
     public void setData(List<T> datas) {
         this.datas = datas;
+        this.sortDatas.addAll(datas);
     }
 
     public void setEmptyCell(int index,ICell realCell){
@@ -92,7 +95,6 @@ public class Column<T extends ICell> {
     public List<T> getData() {
         return datas;
     }
-
 
     public int computeWidth() {
 
@@ -209,4 +211,17 @@ public class Column<T extends ICell> {
     public void setTitleTextAlign(Paint.Align titleTextAlign) {
         this.titleTextAlign = titleTextAlign;
     }
+
+    public int getSortMode() {
+        return sortMode;
+    }
+
+    public void setSortMode(int sortMode) {
+        this.sortMode = sortMode;
+    }
+
+    public List<T> getSortDatas() {
+        return sortDatas;
+    }
+
 }

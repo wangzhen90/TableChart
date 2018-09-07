@@ -30,6 +30,8 @@ public abstract class DataRenderer extends Renderer {
 
     protected Paint mSumValuePaint;
 
+    protected Paint mSortViewPaint;
+
 
 
     public DataRenderer(ViewPortHandler viewPortHandler) {
@@ -67,6 +69,10 @@ public abstract class DataRenderer extends Renderer {
         mBgPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 //        mBgPaint.setColor(Color.parseColor("transparent"));
         mBgPaint.setStyle(Paint.Style.FILL);
+
+        mSortViewPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mSortViewPaint.setColor(Color.parseColor("white"));
+        mSortViewPaint.setStyle(Paint.Style.FILL);
     }
 
 

@@ -34,6 +34,11 @@ public class EmptyCell implements ICell {
     }
 
     @Override
+    public int getRawRow() {
+        return 0;
+    }
+
+    @Override
     public int getColumn() {
         return column;
     }
@@ -95,6 +100,11 @@ public class EmptyCell implements ICell {
 
     @Override
     public void setBgColor(int color) {
+
+    }
+
+    @Override
+    public void setRow(int index) {
 
     }
 }

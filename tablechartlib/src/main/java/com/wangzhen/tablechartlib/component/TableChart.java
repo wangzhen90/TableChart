@@ -3,10 +3,13 @@ package com.wangzhen.tablechartlib.component;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.widget.Toast;
 
 
 import com.wangzhen.tablechartlib.data.CellType;
@@ -27,13 +30,23 @@ import com.wangzhen.tablechartlib.utils.Transformer;
 import com.wangzhen.tablechartlib.utils.Utils;
 import com.wangzhen.tablechartlib.utils.ViewPortHandler;
 
+import java.math.BigDecimal;
+import java.text.Collator;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
+import java.util.regex.Pattern;
 
 /**
  * Created by wangzhen on 2018/6/28.
  */
 
 public class TableChart extends ViewGroup {
+
+    public static final int SORT_DISORDER = 0;
+    public static final int SORT_DES = 1;
+    public static final int SORT_ASC = 2;
 
     private ISheet sheet;
 
@@ -74,6 +87,12 @@ public class TableChart extends ViewGroup {
     private int highlightColor = Color.parseColor("#4558C9");
 
     private int titleValueColor = Color.parseColor("#4D4D4D");
+
+    private boolean sortable = false;
+    private boolean sorting = false;
+    private boolean sorted = false;
+    private int sortMode = SORT_DISORDER;
+
 
     public TableChart(Context context) {
         super(context);
@@ -128,6 +147,7 @@ public class TableChart extends ViewGroup {
 
     public void setSheet(ISheet sheet) {
         this.sheet = sheet;
+        this.sheet.setChart(this);
         notifyDataSetChanged();
     }
 
@@ -148,6 +168,7 @@ public class TableChart extends ViewGroup {
 
         calculateOffsets();
 
+        invalidate();
     }
 
     protected void calcMinMax() {
@@ -491,4 +512,153 @@ public class TableChart extends ViewGroup {
         return sheet.getTextFormatter();
     }
 
+
+    public void sort(final Column<ICell> targetColumn) {
+
+        if (!sortable || sorting || targetColumn.getData() == null || targetColumn.getData().isEmpty())
+            return;
+        sorting = true;
+
+        if (targetColumn.getSortMode() == SORT_DISORDER) {
+            targetColumn.setSortMode(SORT_DES);
+            Toast.makeText(getContext(), "降序", Toast.LENGTH_SHORT).show();
+        } else if (targetColumn.getSortMode() == SORT_DES) {
+            targetColumn.setSortMode(SORT_ASC);
+            Toast.makeText(getContext(), "升序", Toast.LENGTH_SHORT).show();
+
+        } else if (targetColumn.getSortMode() == SORT_ASC) {
+            targetColumn.setSortMode(SORT_DISORDER);
+            Toast.makeText(getContext(), "无序", Toast.LENGTH_SHORT).show();
+        }
+
+        if (targetColumn.getSortMode() == SORT_DISORDER) {
+            sorting = false;
+            resetDatas();
+            sortMode = targetColumn.getSortMode();
+            return;
+        }
+
+        Collections.sort(targetColumn.getSortDatas(), new Comparator<ICell>() {
+            @Override
+            public int compare(ICell o1, ICell o2) {
+                try {
+                    if (targetColumn.columnIndex == 2) {
+                        return sortNumber(o1, o2, targetColumn.getSortMode() == SORT_ASC);
+                    } else {
+                        return sortString(o1, o2, targetColumn.getSortMode() == SORT_ASC);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return 0;
+                }
+            }
+        });
+
+        List<ICell> targetList = targetColumn.getSortDatas();
+        List<Column<ICell>> columns = sheet.getColumnList();
+
+        for (int i = 0; i < targetList.size(); i++) {
+            ICell cell = targetList.get(i);
+
+            ICell changeCell;
+            int rawRowIndex = cell.getRawRow();
+            cell.setRow(i);
+
+            for (int j = 0; j < columns.size(); j++) {
+                if (j == targetColumn.columnIndex) continue;
+                Column<ICell> thisColumn = columns.get(j);
+                changeCell = thisColumn.getData().get(rawRowIndex);
+                changeCell.setRow(i);
+                thisColumn.getSortDatas().set(i, changeCell);
+            }
+        }
+        sortMode = targetColumn.getSortMode();
+        sorting = false;
+
+    }
+
+
+    void resetDatas() {
+
+        List<Column<ICell>> columns = sheet.getColumnList();
+        for (int i = 0; i < columns.size(); i++) {
+            List<ICell> cells = columns.get(i).getData();
+            for (int j = 0; j < cells.size(); j++) {
+                cells.get(j).setRow(j);
+            }
+        }
+
+    }
+
+    static Pattern numberPattern = Pattern.compile("^-?\\d+(\\.\\d+)?$");
+
+    public static boolean isNumber(String str) {
+
+        return numberPattern.matcher(str).matches();
+    }
+
+
+    private int sortNumber(ICell o1, ICell o2, boolean isAsc) {
+
+        if (TextUtils.isEmpty(o1.getContents())) {
+            return isAsc ? -1 : 1;
+        } else if (TextUtils.isEmpty(o2.getContents())) {
+            return isAsc ? 1 : -1;
+        } else if (!isNumber(o1.getContents()) && !isNumber(o2.getContents())) {
+            return sortString(o1, o2, isAsc);
+        } else if (!isNumber(o1.getContents())) {
+            return isAsc ? -1 : 1;
+        } else if (!isNumber(o1.getContents())) {
+            return isAsc ? 1 : -1;
+        }
+
+        return isAsc ? (int) (Float.parseFloat(o2.getContents()) - Float.parseFloat(o1.getContents())) : (int) (Float.parseFloat(o1.getContents()) - Float.parseFloat(o2.getContents()));
+    }
+
+
+    private int sortString(ICell o1, ICell o2, boolean isAsc) {
+
+        Collator collator = Collator.getInstance(Locale.CHINA);
+
+        if (isAsc) {
+            return -collator.compare(o1.getContents(), o2.getContents());
+        } else {
+            return collator.compare(o1.getContents(), o2.getContents());
+        }
+
+    }
+
+    //合并单元格不允许排序
+    public boolean isSortable() {
+        return sortable && !hasMergedCell();
+    }
+
+    public void setSortable(boolean sortable) {
+        this.sortable = sortable;
+    }
+
+    public boolean isSorting() {
+        return sorting;
+    }
+
+    public void setSorting(boolean sorting) {
+        this.sorting = sorting;
+    }
+
+    public boolean isSorted() {
+        return sortMode != SORT_DISORDER;
+    }
+
+
+    public int getSortMode() {
+        return sortMode;
+    }
+
+    public void setSortMode(int sortMode) {
+        this.sortMode = sortMode;
+    }
+
+    public int getColumnPaddingRight(){
+        return  ((Sheet)sheet).columnRightOffset;
+    }
 }

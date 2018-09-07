@@ -1,5 +1,6 @@
 package com.wangzhen.tablechartlib.interfaces;
 
+import com.wangzhen.tablechartlib.component.TableChart;
 import com.wangzhen.tablechartlib.data.Cell;
 import com.wangzhen.tablechartlib.data.Column;
 import com.wangzhen.tablechartlib.formatter.IBgFormatter;
@@ -56,5 +57,9 @@ public interface ISheet<T extends ICell> {
     T getCellByTouchPoint(double xValue, double yValue);
 
     List<ICell> getSumCells();
+
+    void setChart(TableChart chart);
+
+    TableChart getChart();
 
 }

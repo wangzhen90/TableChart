@@ -449,6 +449,8 @@ public class ChartTouchListener extends GestureDetector.SimpleOnGestureListener 
     public boolean onSingleTapUp(MotionEvent e) {
 
 
+        if(mChart.isSortable() && mChart.isSorting()) return true;
+
 
         if(e.getY() >= mChart.getHeight() - (mChart.isShowSum() ? mChart.getRowHeight() * mChart.getViewPortHandler().getScaleY() : 0)){
             return true;
@@ -469,6 +471,13 @@ public class ChartTouchListener extends GestureDetector.SimpleOnGestureListener 
             if(column != null){
                 highlight = new Highlight(mChart,column.columnIndex,null,true);
             }
+            if(mChart.isSortable()){
+                mChart.sort(column);
+                performHighlightForSorted(highlight,e,mChart.isSorted());
+                return super.onSingleTapUp(e);
+            }
+
+
             Log.e("18========",column != null ? column.columnName : "empty column");
         }else{
 
@@ -503,4 +512,18 @@ public class ChartTouchListener extends GestureDetector.SimpleOnGestureListener 
             mChart.highlightValue(h,true);
         }
     }
+
+    protected void performHighlightForSorted(Highlight h, MotionEvent e,boolean isSorted){
+
+
+        if(h == null || (h.equalTo(mHighlight) && !isSorted)){
+            mHighlight = null;
+            mChart.highlightValue(null,true);
+
+        }else{
+            mHighlight = h;
+            mChart.highlightValue(h,true);
+        }
+    }
+
 }
