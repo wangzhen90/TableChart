@@ -3,7 +3,7 @@
 主要功能点如下：
 #### 1.大数据量测试
 以小米6，3000 * 20 的数据量测试，滑动流畅:
-
+![image.png](https://github.com/wangzhen90/TableChart/blob/master/demoGif/%E5%A4%A7%E9%87%8F%E5%88%97.gif)
 #### 2.列固定
 
 #### 3.格式化
