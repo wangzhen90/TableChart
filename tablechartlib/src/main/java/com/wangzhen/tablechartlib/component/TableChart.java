@@ -93,6 +93,8 @@ public class TableChart extends ViewGroup {
     private boolean sorted = false;
     private int sortMode = SORT_DISORDER;
 
+    private boolean drawColumnHighlightBg = true;
+
 
     public TableChart(Context context) {
         super(context);
@@ -660,5 +662,13 @@ public class TableChart extends ViewGroup {
 
     public int getColumnPaddingRight(){
         return  ((Sheet)sheet).columnRightOffset;
+    }
+
+    public boolean isDrawColumnHighlightBg() {
+        return drawColumnHighlightBg;
+    }
+
+    public void setDrawColumnHighlightBg(boolean drawColumnHighlightBg) {
+        this.drawColumnHighlightBg = drawColumnHighlightBg;
     }
 }

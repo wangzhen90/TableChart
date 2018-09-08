@@ -60,7 +60,7 @@ public class SimpleRenderer extends DataRenderer {
         mTitleBuffer = new TitleBuffer(mChart.getColumnCount() * 4, mChart.getColumnCount());
         mSumBuffer = new SumBuffer(mChart.getColumnCount() * 4, mChart.getHeight());
         for (int i = 0; i < mChart.getColumnCount(); i++) {
-            mBuffers[i] = new ColumnBuffer( mChart.isSorted() ? columns.get(i).getSortDatas().size() * 4 :columns.get(i).getData().size() * 4);
+            mBuffers[i] = new ColumnBuffer(mChart.isSorted() ? columns.get(i).getSortDatas().size() * 4 : columns.get(i).getData().size() * 4);
         }
     }
 
@@ -109,7 +109,7 @@ public class SimpleRenderer extends DataRenderer {
         }
         if (transformer == null) return;
 
-        float left = 0, columnLeft = 0,top, right, bottom;
+        float left = 0, columnLeft = 0, top, right, bottom;
 
         boolean isCliped = false;
         boolean hasFixedLeft = false;
@@ -147,7 +147,7 @@ public class SimpleRenderer extends DataRenderer {
         if (mChart.hasMergedCell()) {
             columnBuffer.feed(column, columns);
         } else {
-            columnBuffer.feed(column,mChart.isSorted());
+            columnBuffer.feed(column, mChart.isSorted());
         }
 //        Log.e("2------", "column" + index + "的feed耗费时间：" + (System.currentTimeMillis() - startTime) + "");
 
@@ -163,9 +163,9 @@ public class SimpleRenderer extends DataRenderer {
             currentCell = mChart.isSorted() ? column.getSortDatas().get(i / 4) : column.getData().get(i / 4);
             realCell = currentCell.getRealCell();
 
-            if(currentCell.getType() == CellType.EMPTY){
+            if (currentCell.getType() == CellType.EMPTY) {
                 left = columnBuffer.buffer[i];
-            }else{
+            } else {
                 left = columnLeft;
             }
 
@@ -212,8 +212,8 @@ public class SimpleRenderer extends DataRenderer {
                             valueFormatter.getFormattedValue(realCell, column, columns)
                             : realCell.getContents()
             );
-            if(column.columnIndex == 3)
-            Log.e("2------", column.columnIndex +"_column的第" + i / 4 + "行的draw耗费时间：" + (System.currentTimeMillis() - startTimeDraw) + "");
+            if (column.columnIndex == 3)
+                Log.e("2------", column.columnIndex + "_column的第" + i / 4 + "行的draw耗费时间：" + (System.currentTimeMillis() - startTimeDraw) + "");
 
         }
 
@@ -276,7 +276,7 @@ public class SimpleRenderer extends DataRenderer {
             mTitleValuePaint.setColor(mChart.getTitleValueColor());
         }
 
-        if(mTitleValuePaint.getTextAlign() != column.getTitleTextAlign()){
+        if (mTitleValuePaint.getTextAlign() != column.getTitleTextAlign()) {
             mTitleValuePaint.setTextAlign(column.getTitleTextAlign());
         }
 
@@ -293,7 +293,7 @@ public class SimpleRenderer extends DataRenderer {
             mSumValuePaint.setColor(mChart.getTitleValueColor());
         }
 
-        if(mSumValuePaint.getTextAlign() != column.getTitleTextAlign()){
+        if (mSumValuePaint.getTextAlign() != column.getTitleTextAlign()) {
             mSumValuePaint.setTextAlign(column.getTitleTextAlign());
         }
     }
@@ -418,67 +418,42 @@ public class SimpleRenderer extends DataRenderer {
 
     }
 
-    private void drawArrowUp(Canvas canvas, float left, float top, float right, float bottom,int totalWidth){
+    private void drawArrowDown(Canvas canvas, float top, float bottom, float centerX, float percent) {
 
+        float triangleHeight = (bottom - top) * percent;
+        float triangleWidth = (float) (triangleHeight / Math.sin(Math.PI / 3));
 
-        float paddingTop = mChart.getTitleHeight() / 3;
-        float triangleTop = top + paddingTop;
-        float triangleLength = totalWidth /3;
-        float paddingRight = totalWidth/3;
-        float triangleHeight = (int) (triangleLength * Math.sin(60 * 360 / Math.PI));
-
-        float rectHeight = triangleHeight;
-        float rectWidth = triangleLength/4;
-
-
-        float triangleCenter = right - paddingRight - triangleLength/2 ;
-
+        mSortViewPaint.setStrokeWidth(3f * mViewPortHandler.getScaleX());
 
         Path path = new Path();
-        path.moveTo( triangleCenter, triangleTop);// 此点为多边形的起点
-        path.lineTo(triangleCenter - triangleLength  / 2, triangleTop + triangleHeight);
-        path.lineTo(right - paddingRight, triangleTop + triangleHeight);
+        path.moveTo(centerX, bottom);// 此点为多边形的起点
+        path.lineTo(centerX - triangleWidth / 2, bottom - triangleHeight);
+        path.lineTo(centerX + triangleWidth / 2, bottom - triangleHeight);
         path.close(); // 使这些点构成封闭的多边形
         canvas.drawPath(path, mSortViewPaint);
-        canvas.drawRect(triangleCenter - rectWidth/2,
-                triangleTop + triangleHeight,
-                triangleCenter + rectWidth/2,
-                triangleTop + triangleHeight + rectHeight,
-                mSortViewPaint
-        );
+
+
+        canvas.drawLine(centerX, top, centerX, bottom- triangleHeight/2, mSortViewPaint);
+
 
     }
 
-    private void drawArrowDown(Canvas canvas, float left, float top, float right, float bottom,int totalWidth){
+    private void drawArrowUp(Canvas canvas, float top, float bottom, float centerX, float percent) {
 
+        float triangleHeight = (bottom - top) * percent;
+        float triangleWidth = (float) (triangleHeight / Math.sin(Math.PI / 3));
 
-        float paddingTop = mChart.getTitleHeight() / 3;
-        float triangleTop = top + paddingTop;
-        float triangleLength = totalWidth /3;
-        float paddingRight = totalWidth/3;
-        float triangleHeight = (int) (triangleLength * Math.sin(60 * 360 / Math.PI));
-
-        float rectHeight = triangleHeight;
-        float rectWidth = triangleLength/4;
-
-
-        float triangleCenter = right - paddingRight - triangleLength/2 ;
-
-
-
-        canvas.drawRect(triangleCenter - rectWidth/2,
-                triangleTop,
-                triangleCenter + rectWidth/2,
-                triangleTop + rectHeight,
-                mSortViewPaint
-        );
+        mSortViewPaint.setStrokeWidth(3f * mViewPortHandler.getScaleX());
 
         Path path = new Path();
-        path.moveTo( triangleCenter, triangleTop + triangleHeight + rectHeight);// 此点为多边形的起点
-        path.lineTo(triangleCenter - triangleLength  / 2, triangleTop + rectHeight);
-        path.lineTo(right - paddingRight, triangleTop + rectHeight);
+        path.moveTo(centerX, top);// 此点为多边形的起点
+        path.lineTo(centerX - triangleWidth / 2, top + triangleHeight);
+        path.lineTo(centerX + triangleWidth / 2, top + triangleHeight);
         path.close(); // 使这些点构成封闭的多边形
         canvas.drawPath(path, mSortViewPaint);
+
+
+        canvas.drawLine(centerX, top + triangleHeight / 2, centerX, bottom, mSortViewPaint);
 
     }
 
@@ -530,15 +505,22 @@ public class SimpleRenderer extends DataRenderer {
                     hRect.bottom - halfBorderWidth,
                     mHighlightPaint);
 
-            if(mChart.isSorted() && highlight.isTitle()){
-                Log.e("18========","drawArrow");
-                if(mChart.getSortMode() == TableChart.SORT_DES){
-                    drawArrowDown(c,hRect.left,hRect.top,hRect.right,hRect.top + mChart.getTitleHeight(),mChart.getColumnPaddingRight());
-                }else{
-                    drawArrowUp(c,hRect.left,hRect.top,hRect.right,hRect.top + mChart.getTitleHeight(),mChart.getColumnPaddingRight());
+            if (mChart.isSorted() && mChart.isSortable() && highlight.isTitle()) {
+
+                float top = 0, bottom = top + mChart.getTitleHeight() * mViewPortHandler.getScaleX();
+                float totalWidth = mChart.getColumnPaddingRight() * mViewPortHandler.getScaleX();
+                float centerLine = hRect.right - totalWidth / 2;
+
+                float arrowHeight = (bottom - top) / 3;
+                float arrowTop = top + (bottom - top - arrowHeight) / 2;
+                float arrowBottom = arrowTop + arrowHeight;
+
+                if (mChart.getSortMode() == TableChart.SORT_DES) {
+                    drawArrowDown(c, arrowTop, arrowBottom, centerLine, 0.5f);
+                } else {
+                    drawArrowUp(c, arrowTop, arrowBottom, centerLine, 0.5f);
                 }
             }
-
 
             c.restoreToCount(clipRestoreCount);
         }
